@@ -2,8 +2,8 @@ package com.github.mdjdrn1.MPKKrakowTimetable;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
-import com.github.mdjdrn1.MPKKrakowTimetable.stuctures.Direction;
-import com.github.mdjdrn1.MPKKrakowTimetable.stuctures.Stop;
+import com.github.mdjdrn1.MPKKrakowTimetable.structures.Direction;
+import com.github.mdjdrn1.MPKKrakowTimetable.structures.Stop;
 
 import java.io.IOException;
 import java.util.ArrayList;

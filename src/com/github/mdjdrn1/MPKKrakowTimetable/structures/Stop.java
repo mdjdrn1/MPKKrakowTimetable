@@ -1,4 +1,4 @@
-package com.github.mdjdrn1.MPKKrakowTimetable.stuctures;
+package com.github.mdjdrn1.MPKKrakowTimetable.structures;
 
 public class Stop
 {

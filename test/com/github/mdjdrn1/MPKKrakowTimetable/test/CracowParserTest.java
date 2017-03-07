@@ -2,8 +2,8 @@ package com.github.mdjdrn1.MPKKrakowTimetable.test;
 
 import com.github.mdjdrn1.MPKKrakowTimetable.CracowParser;
 import com.github.mdjdrn1.MPKKrakowTimetable.IParser;
-import com.github.mdjdrn1.MPKKrakowTimetable.stuctures.Direction;
-import com.github.mdjdrn1.MPKKrakowTimetable.stuctures.Stop;
+import com.github.mdjdrn1.MPKKrakowTimetable.structures.Direction;
+import com.github.mdjdrn1.MPKKrakowTimetable.structures.Stop;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
