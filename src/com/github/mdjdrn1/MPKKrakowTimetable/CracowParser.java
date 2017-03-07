@@ -1,11 +1,8 @@
 package com.github.mdjdrn1.MPKKrakowTimetable;
 
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.HtmlTableCell;
-import com.github.mdjdrn1.MPKKrakowTimetable.stuctures.Stop;
+import com.gargoylesoftware.htmlunit.html.*;
+import com.github.mdjdrn1.MPKKrakowTimetable.stuctures.Direction;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,14 +10,62 @@ import java.util.List;
 
 public class CracowParser implements IParser
 {
-    static private final String homepage = "http://rozklady.mpk.krakow.pl/";
+    private final String homePage;
+    private final String linePageBase;
+
+    public CracowParser() throws Exception
+    {
+        homePage = "http://rozklady.mpk.krakow.pl/";
+        linePageBase = getLineUrlBase();
+    }
+
+    private String getLineUrlBase() throws Exception
+    {
+        String timetableURL = null;
+        HtmlPage page = getHtmlPage(homePage);
+
+        HtmlTableCell cell = (HtmlTableCell) page.getFirstByXPath("//td[@class='linia_table_left']");
+
+        if (cell == null)
+            throw new Exception("getLineUrlBase() exception. Cannot find td class='linia_table_left'.");
+
+        HtmlAnchor itemAnchor = (HtmlAnchor) cell.getFirstByXPath("./a");
+        if (itemAnchor == null)
+            throw new Exception("getLineUrlBase() exception. Page content was invalid.");
+        else
+            timetableURL = itemAnchor.getHrefAttribute();
+
+        // TODO: check if url has valid format
+        timetableURL = timetableURL.replaceFirst("\\d$", ""); // removes last character
+
+        return timetableURL;
+    }
+
+    private static HtmlPage getHtmlPage(String url) throws Exception
+    {
+        WebClient client = new WebClient();
+        client.getOptions().setCssEnabled(true);
+        client.getOptions().setJavaScriptEnabled(false);
+
+        HtmlPage page = null;
+        try
+        {
+            page = client.getPage(url);
+        }
+        catch (IOException e)
+        {
+            throw new Exception("Cannot parse page from url: \"" + url + "\".");
+        }
+
+        return page;
+    }
 
     @Override
     public List<Integer> getLinesNumbersList() throws Exception
     {
         List<Integer> lineNumbers = new ArrayList<>();
 
-        HtmlPage page = getHtmlPage(homepage);
+        HtmlPage page = getHtmlPage(homePage);
 
         List<HtmlTableCell> items = (List<HtmlTableCell>) page.getByXPath("//td[@class='linia_table_left']");
 
@@ -44,22 +89,50 @@ public class CracowParser implements IParser
         return lineNumbers;
     }
 
-    private HtmlPage getHtmlPage(String url) throws Exception
+    @Override
+    public List<Direction> getDirectionsList(int lineNumber) throws Exception
     {
-        WebClient client = new WebClient();
-        client.getOptions().setCssEnabled(false);
-        client.getOptions().setJavaScriptEnabled(false);
+        List<Direction> directions = new ArrayList<Direction>();
 
-        HtmlPage page = null;
-        try
+        HtmlPage page = getHtmlPage(getLineUrl(lineNumber));
+
+        HtmlParagraph paragraph = (HtmlParagraph) page.getFirstByXPath("//p[@style=' font-size: 40px;']");
+        if (paragraph == null)
+            throw new Exception("getDirectionsList() exception. Cannot found paragraph.");
+
+        List<HtmlTableCell> items = (List<HtmlTableCell>) paragraph.getByXPath("../../../td[@style='text-align: left; white-space: nowrap; ']");
+        if (items == null)
+            throw new Exception("getDirectionsList() exception. Cannot find table cell.");
+        else
         {
-            page = client.getPage(url);
-        }
-        catch (IOException e)
-        {
-            throw new Exception("Cannot parse page from url: \"" + url + "\".");
+            List<HtmlAnchor> itemAnchor = (List<HtmlAnchor>) items.get(0).getByXPath("./a");
+
+
+            if (itemAnchor.size() == 0 || itemAnchor.size() > 2)
+            {
+                throw new Exception("getDirectionsList() exception. Directions parsing error.");
+            }
+
+            String directionName = itemAnchor.get(0).asText();
+            directionName = directionName.substring(directionName.lastIndexOf('-') + 1).trim();
+
+            directions.add(new Direction(directionName, 1));
+
+            if (itemAnchor.size() == 2)
+            {
+                directionName = itemAnchor.get(1).asText();
+                directionName = directionName.substring(directionName.lastIndexOf('-') + 1).trim();
+
+                directions.add(new Direction(directionName, 2));
+            }
         }
 
-        return page;
+
+        return directions;
+    }
+
+    public String getLineUrl(int lineNumber)
+    {
+        return linePageBase + lineNumber;
     }
 }
