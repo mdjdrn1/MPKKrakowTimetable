@@ -5,6 +5,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.gargoylesoftware.htmlunit.html.HtmlTableCell;
+import com.github.mdjdrn1.MPKKrakowTimetable.stuctures.Stop;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ public class CracowParser implements IParser
 {
     static private final String homepage = "http://rozklady.mpk.krakow.pl/";
 
+    @Override
     public List<Integer> getLinesNumbersList() throws Exception
     {
         List<Integer> lineNumbers = new ArrayList<>();
@@ -22,13 +24,8 @@ public class CracowParser implements IParser
 
         List<HtmlTableCell> items = (List<HtmlTableCell>) page.getByXPath("//td[@class='linia_table_left']");
 
-        if (items == null)
-            System.out.println("items null");
-
-        if (items.isEmpty())
-        {
-            System.out.println("No items found !");
-        }
+        if (items == null || items.isEmpty())
+            throw new Exception("getLinesNumbersList() exception. Cannot find td class='linia_table_left'.");
         else
         {
             for (HtmlElement htmlItem : items)
@@ -37,11 +34,9 @@ public class CracowParser implements IParser
                 for (HtmlAnchor item : itemAnchor)
                 {
                     if (item == null)
-                        System.out.println("anchor null");
+                        throw new Exception("getLinesNumbersList() exception. Lines numbers parsing error.");
                     else
-                    {
                         lineNumbers.add(Integer.valueOf(item.asText()));
-                    }
                 }
             }
         }
@@ -62,7 +57,7 @@ public class CracowParser implements IParser
         }
         catch (IOException e)
         {
-            throw new Exception("Cannot parse page from url: " + url + ".");
+            throw new Exception("Cannot parse page from url: \"" + url + "\".");
         }
 
         return page;
