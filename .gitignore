@@ -47,3 +47,5 @@ fabric.properties
 # User-defined
 .idea/*
 *.iml
+target/*
+example.*
