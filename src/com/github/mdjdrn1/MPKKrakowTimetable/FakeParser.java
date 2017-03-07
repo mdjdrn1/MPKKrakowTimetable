@@ -6,7 +6,7 @@ import java.util.List;
 
 public class FakeParser implements IParser
 {
-    public List<Integer> getLineNumberList()
+    public List<Integer> getLinesNumbersList()
     {
         List<Integer> linesList = new ArrayList<>();
         linesList.addAll(Arrays.asList(1, 2, 3, 4, 5));

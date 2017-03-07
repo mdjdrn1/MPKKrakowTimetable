@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface IParser
 {
-    List<Integer> getLineNumberList() throws Exception;
+    List<Integer> getLinesNumbersList() throws Exception;
 }
