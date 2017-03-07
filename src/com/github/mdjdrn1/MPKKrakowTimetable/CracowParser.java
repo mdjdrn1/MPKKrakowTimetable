@@ -3,6 +3,7 @@ package com.github.mdjdrn1.MPKKrakowTimetable;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
 import com.github.mdjdrn1.MPKKrakowTimetable.stuctures.Direction;
+import com.github.mdjdrn1.MPKKrakowTimetable.stuctures.Stop;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -127,12 +128,18 @@ public class CracowParser implements IParser
             }
         }
 
-
         return directions;
     }
 
     public String getLineUrl(int lineNumber)
     {
         return linePageBase + lineNumber;
+    }
+
+    // TODO: add valid implementation
+    @Override
+    public List<Stop> getStopsList(int lineNumber, Direction direction) throws Exception
+    {
+        return new ArrayList<Stop>();
     }
 }

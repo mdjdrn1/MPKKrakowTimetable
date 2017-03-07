@@ -3,6 +3,7 @@ package com.github.mdjdrn1.MPKKrakowTimetable.test;
 import com.github.mdjdrn1.MPKKrakowTimetable.CracowParser;
 import com.github.mdjdrn1.MPKKrakowTimetable.IParser;
 import com.github.mdjdrn1.MPKKrakowTimetable.stuctures.Direction;
+import com.github.mdjdrn1.MPKKrakowTimetable.stuctures.Stop;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -68,4 +69,47 @@ public class CracowParserTest
         List<Direction> actualDirections = parser.getDirectionsList(451);
         assertThat(actualDirections).isEqualTo(expectedDirections);
     }
+
+    @Test
+    void stopsListFor116Test() throws Exception
+    {
+        IParser parser = new CracowParser();
+
+        List<Stop> expectedStops = new ArrayList<>(
+                Arrays.asList(
+                        new Stop("Czerwone Maki P+R", 1),
+                        new Stop("Czerwone Maki P+R", 2),
+                        new Stop("Mochnaniec", 3),
+                        new Stop("Skotniki Szkoła", 4),
+                        new Stop("Brücknera", 5),
+                        new Stop("Skotniki", 6),
+                        new Stop("Orszy-Broniewskiego", 7)
+                )
+        );
+
+        Direction direction = parser.getDirectionsList(116).get(0);
+        List<Stop> actualStops = parser.getStopsList(116, direction);
+
+        assertThat(actualStops).isEqualTo(expectedStops);
+    }
+
+    @Test
+    void stopsListFor100Test() throws Exception
+    {
+        IParser parser = new CracowParser();
+
+        List<Stop> expectedStops = new ArrayList<>(
+                Arrays.asList(
+                        new Stop("Salwator", 1),
+                        new Stop("Malczewskiego", 2),
+                        new Stop("Aleja Waszyngtona", 3)
+                )
+        );
+
+        Direction direction = parser.getDirectionsList(100).get(0);
+        List<Stop> actualStops = parser.getStopsList(100, direction);
+
+        assertThat(actualStops).isEqualTo(expectedStops);
+    }
+
 }
