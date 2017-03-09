@@ -31,7 +31,7 @@ public class CracowParserTest
     }
 
     @Test
-    void shouldReturnValidLine52Number() throws Exception
+    void shouldReturnValidLine52URL() throws Exception
     {
         CracowParser parser = new CracowParser();
 
@@ -111,5 +111,4 @@ public class CracowParserTest
 
         assertThat(actualStops).isEqualTo(expectedStops);
     }
-
 }

@@ -42,6 +42,22 @@ public class CracowParser implements IParser
         return timetableURL;
     }
 
+    public String getLineUrl(int lineNumber)
+    {
+        // TODO: check if line exists
+        return linePageBase + lineNumber;
+    }
+
+    public String getLineUrl(int lineNumber, Direction direction)
+    {
+        return getLineUrl(lineNumber) + "__" + direction.getId();
+    }
+
+    public String getLineUrl(int lineNumber, Direction direction, Stop stop)
+    {
+        return getLineUrl(lineNumber, direction) + "__" + stop.getId();
+    }
+
     private static HtmlPage getHtmlPage(String url) throws Exception
     {
         WebClient client = new WebClient();
@@ -70,7 +86,7 @@ public class CracowParser implements IParser
 
         List<HtmlTableCell> items = (List<HtmlTableCell>) page.getByXPath("//td[@class='linia_table_left']");
 
-        if (items == null || items.isEmpty())
+        if (items == null)
             throw new Exception("getLinesNumbersList() exception. Cannot find td class='linia_table_left'.");
         else
         {
@@ -93,11 +109,11 @@ public class CracowParser implements IParser
     @Override
     public List<Direction> getDirectionsList(int lineNumber) throws Exception
     {
-        List<Direction> directions = new ArrayList<Direction>();
+        List<Direction> directions = new ArrayList<>();
 
         HtmlPage page = getHtmlPage(getLineUrl(lineNumber));
 
-        HtmlParagraph paragraph = (HtmlParagraph) page.getFirstByXPath("//p[@style=' font-size: 40px;']");
+        HtmlParagraph paragraph = (HtmlParagraph) page.getFirstByXPath("//p[contains(@style,'font-size: 40px;')]");
         if (paragraph == null)
             throw new Exception("getDirectionsList() exception. Cannot found paragraph.");
 
@@ -131,15 +147,38 @@ public class CracowParser implements IParser
         return directions;
     }
 
-    public String getLineUrl(int lineNumber)
-    {
-        return linePageBase + lineNumber;
-    }
-
-    // TODO: add valid implementation
     @Override
     public List<Stop> getStopsList(int lineNumber, Direction direction) throws Exception
     {
-        return new ArrayList<Stop>();
+        List<Stop> stopsList = new ArrayList<>();
+
+        HtmlPage page = getHtmlPage(getLineUrl(lineNumber, direction));
+
+        List<HtmlTableCell> items = (List<HtmlTableCell>) page.getByXPath("//td[@style=' text-align: right; ']");
+
+        if (items == null)
+            throw new Exception("getStopsList() exception. Cannot find table cell.");
+        else
+        {
+
+            for (HtmlElement htmlItem : items)
+            {
+                List<HtmlAnchor> htmlAnchors = (List<HtmlAnchor>) htmlItem.getByXPath("./a");
+                if (htmlAnchors == null)
+                    throw new Exception("getStopsList() exception. Cannot find anchors.");
+                for (HtmlAnchor item : htmlAnchors)
+                {
+                    if (item != null)
+                    {
+                        String stopName = item.asText();
+                        Integer stopID = Integer.valueOf(item.getHrefAttribute().split("\\d__\\d")[1].replaceFirst("__", ""));
+
+                        stopsList.add(new Stop(stopName, stopID));
+                    }
+                }
+            }
+        }
+
+        return stopsList;
     }
 }
