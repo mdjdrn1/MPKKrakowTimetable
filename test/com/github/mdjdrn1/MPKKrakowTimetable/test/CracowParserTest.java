@@ -56,7 +56,7 @@ public class CracowParserTest
 
 
     @Test
-    void directionsListFor451() throws Exception
+    void directionsListLine451() throws Exception
     {
 
         IParser parser = new CracowParser();
@@ -71,7 +71,7 @@ public class CracowParserTest
     }
 
     @Test
-    void stopsListFor116Test() throws Exception
+    void stopsListLine116() throws Exception
     {
         IParser parser = new CracowParser();
 
@@ -94,7 +94,7 @@ public class CracowParserTest
     }
 
     @Test
-    void stopsListFor100Test() throws Exception
+    void stopsListLine100() throws Exception
     {
         IParser parser = new CracowParser();
 
@@ -110,5 +110,53 @@ public class CracowParserTest
         List<Stop> actualStops = parser.getStopsList(100, direction);
 
         assertThat(actualStops).isEqualTo(expectedStops);
+    }
+
+    @Test
+    void timetableLine213() throws Exception
+    {
+        IParser parser = new CracowParser();
+
+        ArrayList<ArrayList<List<String>>> expectedTimetable = new ArrayList<>(3);
+        System.out.printf("expectedTimetable.size() " + expectedTimetable.size());
+
+        while(expectedTimetable.size() < 3)
+            expectedTimetable.add(new ArrayList<List<String>>(24));
+
+        for(int i = 0; i < expectedTimetable.size(); ++i)
+        {
+            while(expectedTimetable.get(i).size() < 24)
+                expectedTimetable.get(i).add(new ArrayList<String>());
+        }
+
+        expectedTimetable.get(0).set(4, Arrays.asList("00", "50"));
+        expectedTimetable.get(0).set(6, Arrays.asList("10"));
+        expectedTimetable.get(0).set(7, Arrays.asList("10"));
+        expectedTimetable.get(0).set(8, Arrays.asList("20"));
+        expectedTimetable.get(0).set(10, Arrays.asList("05"));
+        expectedTimetable.get(0).set(12, Arrays.asList("30"));
+        expectedTimetable.get(0).set(14, Arrays.asList("10", "45"));
+        expectedTimetable.get(0).set(15, Arrays.asList("50"));
+        expectedTimetable.get(0).set(16, Arrays.asList("45"));
+        expectedTimetable.get(0).set(17, Arrays.asList("30"));
+        expectedTimetable.get(0).set(18, Arrays.asList("35"));
+        expectedTimetable.get(0).set(19, Arrays.asList("30"));
+        expectedTimetable.get(0).set(22, Arrays.asList("25"));
+
+        expectedTimetable.get(1).set(4, Arrays.asList("20"));
+        expectedTimetable.get(1).set(6, Arrays.asList("00"));
+        expectedTimetable.get(1).set(20, Arrays.asList("25"));
+        expectedTimetable.get(1).set(20, Arrays.asList("05"));
+
+        expectedTimetable.get(2).set(4, Arrays.asList("20"));
+        expectedTimetable.get(2).set(6, Arrays.asList("00"));
+        expectedTimetable.get(2).set(20, Arrays.asList("25"));
+        expectedTimetable.get(2).set(20, Arrays.asList("05"));
+
+        Direction direction = parser.getDirectionsList(113).get(0);
+        Stop stop = parser.getStopsList(113, direction).get(0);
+        ArrayList<ArrayList<List<String>>> actualTimetable = parser.getTimetable(100, direction, stop);
+
+        assertThat(actualTimetable).isEqualTo(expectedTimetable);
     }
 }

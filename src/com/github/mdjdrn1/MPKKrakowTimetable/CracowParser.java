@@ -14,6 +14,8 @@ public class CracowParser implements IParser
     private final String homePage;
     private final String linePageBase;
 
+    public static enum Day {WEEKDAY, SATURDAY, SUNDAY};
+
     public CracowParser() throws Exception
     {
         homePage = "http://rozklady.mpk.krakow.pl/";
@@ -180,5 +182,11 @@ public class CracowParser implements IParser
         }
 
         return stopsList;
+    }
+
+    @Override
+    public ArrayList<ArrayList<List<String>>> getTimetable(int lineNumber, Direction direction, Stop stop) throws Exception
+    {
+        return new ArrayList<ArrayList<List<String>>>();
     }
 }
