@@ -115,10 +115,10 @@ public class CracowParserTest
     @Test
     void timetableLine213() throws Exception
     {
-        IParser parser = new CracowParser();
+        // TODO: run test only if timetable didn't change (assume?)
+        CracowParser parser = new CracowParser();
 
         ArrayList<ArrayList<List<String>>> expectedTimetable = new ArrayList<>(3);
-        System.out.printf("expectedTimetable.size() " + expectedTimetable.size());
 
         while(expectedTimetable.size() < 3)
             expectedTimetable.add(new ArrayList<List<String>>(24));
@@ -146,16 +146,16 @@ public class CracowParserTest
         expectedTimetable.get(1).set(4, Arrays.asList("20"));
         expectedTimetable.get(1).set(6, Arrays.asList("00"));
         expectedTimetable.get(1).set(20, Arrays.asList("25"));
-        expectedTimetable.get(1).set(20, Arrays.asList("05"));
+        expectedTimetable.get(1).set(22, Arrays.asList("05"));
 
         expectedTimetable.get(2).set(4, Arrays.asList("20"));
         expectedTimetable.get(2).set(6, Arrays.asList("00"));
         expectedTimetable.get(2).set(20, Arrays.asList("25"));
-        expectedTimetable.get(2).set(20, Arrays.asList("05"));
+        expectedTimetable.get(2).set(22, Arrays.asList("05"));
 
-        Direction direction = parser.getDirectionsList(113).get(0);
-        Stop stop = parser.getStopsList(113, direction).get(0);
-        ArrayList<ArrayList<List<String>>> actualTimetable = parser.getTimetable(100, direction, stop);
+        Direction direction = parser.getDirectionsList(213).get(0);
+        Stop stop = parser.getStopsList(213, direction).get(0);
+        ArrayList<ArrayList<List<String>>> actualTimetable = parser.getTimetable(213, direction, stop);
 
         assertThat(actualTimetable).isEqualTo(expectedTimetable);
     }

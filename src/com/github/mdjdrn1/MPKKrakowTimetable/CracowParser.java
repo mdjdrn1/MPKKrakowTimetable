@@ -7,14 +7,13 @@ import com.github.mdjdrn1.MPKKrakowTimetable.structures.Stop;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CracowParser implements IParser
 {
     private final String homePage;
     private final String linePageBase;
-
-    public static enum Day {WEEKDAY, SATURDAY, SUNDAY};
 
     public CracowParser() throws Exception
     {
@@ -127,22 +126,22 @@ public class CracowParser implements IParser
             List<HtmlAnchor> itemAnchor = (List<HtmlAnchor>) items.get(0).getByXPath("./a");
 
 
-            if (itemAnchor.size() == 0 || itemAnchor.size() > 2)
+            if (itemAnchor.size() == 0)
             {
                 throw new Exception("getDirectionsList() exception. Directions parsing error.");
             }
 
-            String directionName = itemAnchor.get(0).asText();
-            directionName = directionName.substring(directionName.lastIndexOf('-') + 1).trim();
+            int id = 1;
 
-            directions.add(new Direction(directionName, 1));
-
-            if (itemAnchor.size() == 2)
+            for (HtmlAnchor anchor : itemAnchor)
             {
-                directionName = itemAnchor.get(1).asText();
-                directionName = directionName.substring(directionName.lastIndexOf('-') + 1).trim();
+                String directionName = anchor.asText();
+                if (id % 2 == 1)
+                    directionName = directionName.substring(directionName.lastIndexOf('-') + 1).trim();
+                else
+                    directionName = directionName.substring(directionName.lastIndexOf('-') + 1).trim();
 
-                directions.add(new Direction(directionName, 2));
+                directions.add(new Direction(directionName, id++));
             }
         }
 
@@ -184,9 +183,82 @@ public class CracowParser implements IParser
         return stopsList;
     }
 
+    /**
+     * @return ArrayList (size up to 3 - index 0: weekday; index 1: saturdays; index 2: holidays)
+     * of ArrayLists (size 24 for each - each representing hour)
+     * of List<String> (representing departure minutes)
+     */
     @Override
     public ArrayList<ArrayList<List<String>>> getTimetable(int lineNumber, Direction direction, Stop stop) throws Exception
     {
-        return new ArrayList<ArrayList<List<String>>>();
+        // TODO: doesn't work for timetable with only weekday or only weekday and saturday
+        // TODO: take into account, some lines (e.g night lines) have timetable for all days of week or only friday/saturday etc.
+
+        ArrayList<ArrayList<List<String>>> timetable = new ArrayList<ArrayList<List<String>>>(3);
+
+        while (timetable.size() < 3)
+            timetable.add(new ArrayList<List<String>>(24));
+
+        for (int i = 0; i < timetable.size(); ++i)
+            while (timetable.get(i).size() < 24)
+                timetable.get(i).add(new ArrayList<String>());
+
+        HtmlPage page = getHtmlPage(getLineUrl(lineNumber, direction));
+
+        List<HtmlTableRow> items = (List<HtmlTableRow>) page.getByXPath("//tr[@style=' margin-bottom: 10px; ']");
+
+        if (items == null || items.isEmpty())
+        {
+            throw new Exception("getTimetable() exception. Cannot find tr style=margin-bottom: 10px;");
+        }
+        else
+        {
+            for (HtmlElement htmlItem : items)
+            {
+                List<HtmlTableCell> tableCells = (List<HtmlTableCell>) htmlItem.getByXPath("../tr/td");
+
+                for (int i = 5; i + 3 < tableCells.size(); i += 4)
+                {
+                    HtmlTableCell item = tableCells.get(i);
+                    Integer hour = getTableCellValue(item);
+
+                    if (hour == null)
+                        break;
+
+                    for (int k = 0; k < 3; ++k)
+                    {
+                        ArrayList<String> minutes = getAllTableCellValues(tableCells.get(i + k + 1));
+                        if (minutes != null && !minutes.isEmpty())
+                            timetable.get(k).set(hour, minutes);
+                    }
+                }
+            }
+        }
+        return timetable;
+    }
+
+
+    private static Integer getTableCellValue(HtmlTableCell item)
+    {
+        try
+        {
+            return Integer.valueOf(item.asText().trim());
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+
+    private static ArrayList<String> getAllTableCellValues(HtmlTableCell item)
+    {
+        String itemAsText = item.asText().trim();
+        if (itemAsText.isEmpty())
+            return null;
+
+        String[] stringValues = item.asText().split(" ");
+        ArrayList<String> values = new ArrayList<>(Arrays.asList(stringValues));
+
+        return !values.isEmpty() ? values : null;
     }
 }
