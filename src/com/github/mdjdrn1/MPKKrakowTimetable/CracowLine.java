@@ -10,85 +10,34 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class CracowParser implements IParser
+public class CracowLine implements ILine
 {
-    private final String homePage;
-    private final String linePageBase;
+    private static List<Integer> lineNumbersList;
+    private static CracowURLCreator urlCreator = new CracowURLCreator();
+    private final Integer lineNumber;
 
-    public CracowParser() throws Exception
+    static
     {
-        homePage = "http://rozklady.mpk.krakow.pl/";
-        linePageBase = getLineUrlBase();
-    }
-
-    private String getLineUrlBase() throws Exception
-    {
-        String timetableURL = null;
-        HtmlPage page = getHtmlPage(homePage);
-
-        HtmlTableCell cell = (HtmlTableCell) page.getFirstByXPath("//td[@class='linia_table_left']");
-
-        if (cell == null)
-            throw new Exception("getLineUrlBase() exception. Cannot find td class='linia_table_left'.");
-
-        HtmlAnchor itemAnchor = (HtmlAnchor) cell.getFirstByXPath("./a");
-        if (itemAnchor == null)
-            throw new Exception("getLineUrlBase() exception. Page content was invalid.");
-        else
-            timetableURL = itemAnchor.getHrefAttribute();
-
-        // TODO: check if url has valid format
-        timetableURL = timetableURL.replaceFirst("\\d$", ""); // removes last character
-
-        return timetableURL;
-    }
-
-    public String getLineUrl(int lineNumber)
-    {
-        // TODO: check if line exists
-        return linePageBase + lineNumber;
-    }
-
-    public String getLineUrl(int lineNumber, Direction direction)
-    {
-        return getLineUrl(lineNumber) + "__" + direction.getId();
-    }
-
-    public String getLineUrl(int lineNumber, Direction direction, Stop stop)
-    {
-        return getLineUrl(lineNumber, direction) + "__" + stop.getId();
-    }
-
-    private static HtmlPage getHtmlPage(String url) throws Exception
-    {
-        WebClient client = new WebClient();
-        client.getOptions().setCssEnabled(true);
-        client.getOptions().setJavaScriptEnabled(false);
-
-        HtmlPage page = null;
         try
         {
-            page = client.getPage(url);
+            lineNumbersList = getLineNumbersList();
         }
-        catch (IOException e)
+        catch (Exception e)
         {
-            throw new Exception("Cannot parse page from url: \"" + url + "\".");
+            System.out.println("Failed initializing static CracowLine members.");
         }
-
-        return page;
     }
 
-    @Override
-    public List<Integer> getLinesNumbersList() throws Exception
+    public static List<Integer> getLineNumbersList() throws Exception
     {
         List<Integer> lineNumbers = new ArrayList<>();
 
-        HtmlPage page = getHtmlPage(homePage);
+        HtmlPage page = getHtmlPage(urlCreator.getHomePage());
 
         List<HtmlTableCell> items = (List<HtmlTableCell>) page.getByXPath("//td[@class='linia_table_left']");
 
         if (items == null)
-            throw new Exception("getLinesNumbersList() exception. Cannot find td class='linia_table_left'.");
+            throw new Exception("getLineNumbersList() exception. Cannot find td class='linia_table_left'.");
         else
         {
             for (HtmlElement htmlItem : items)
@@ -97,7 +46,7 @@ public class CracowParser implements IParser
                 for (HtmlAnchor item : itemAnchor)
                 {
                     if (item == null)
-                        throw new Exception("getLinesNumbersList() exception. Lines numbers parsing error.");
+                        throw new Exception("getLineNumbersList() exception. Lines numbers parsing error.");
                     else
                         lineNumbers.add(Integer.valueOf(item.asText()));
                 }
@@ -107,12 +56,20 @@ public class CracowParser implements IParser
         return lineNumbers;
     }
 
+    public CracowLine(int lineNumber) throws Exception
+    {
+        if(!lineNumbersList.contains(lineNumber))
+            throw new Exception("Line " + lineNumber + " doesn't exist.");
+
+        this.lineNumber = lineNumber;
+    }
+
     @Override
-    public List<Direction> getDirectionsList(int lineNumber) throws Exception
+    public List<Direction> getDirectionsList() throws Exception
     {
         List<Direction> directions = new ArrayList<>();
 
-        HtmlPage page = getHtmlPage(getLineUrl(lineNumber));
+        HtmlPage page = getHtmlPage(urlCreator.getLineUrl(lineNumber));
 
         HtmlParagraph paragraph = (HtmlParagraph) page.getFirstByXPath("//p[contains(@style,'font-size: 40px;')]");
         if (paragraph == null)
@@ -149,11 +106,11 @@ public class CracowParser implements IParser
     }
 
     @Override
-    public List<Stop> getStopsList(int lineNumber, Direction direction) throws Exception
+    public List<Stop> getStopsList(Direction direction) throws Exception
     {
         List<Stop> stopsList = new ArrayList<>();
 
-        HtmlPage page = getHtmlPage(getLineUrl(lineNumber, direction));
+        HtmlPage page = getHtmlPage(urlCreator.getLineUrl(lineNumber, direction));
 
         List<HtmlTableCell> items = (List<HtmlTableCell>) page.getByXPath("//td[@style=' text-align: right; ']");
 
@@ -185,16 +142,16 @@ public class CracowParser implements IParser
 
     /**
      * @return ArrayList (size up to 3 - index 0: weekday; index 1: saturdays; index 2: holidays)
-     * of ArrayLists (size 24 for each - each representing hour)
+     * of ArrayLists - representing hour (size 24 for day lines; size 8 for night lines)
      * of List<String> (representing departure minutes)
      */
     @Override
-    public ArrayList<ArrayList<List<String>>> getTimetable(int lineNumber, Direction direction, Stop stop) throws Exception
+    public ArrayList<ArrayList<List<String>>> getTimetable(Direction direction, Stop stop) throws Exception
     {
         // TODO: doesn't work for timetable with only weekday or only weekday and saturday
         // TODO: take into account, some lines (e.g night lines) have timetable for all days of week or only friday/saturday etc.
 
-        ArrayList<ArrayList<List<String>>> timetable = new ArrayList<ArrayList<List<String>>>(3);
+        ArrayList<ArrayList<List<String>>> timetable = new ArrayList<>(3);
 
         while (timetable.size() < 3)
             timetable.add(new ArrayList<List<String>>(24));
@@ -203,7 +160,7 @@ public class CracowParser implements IParser
             while (timetable.get(i).size() < 24)
                 timetable.get(i).add(new ArrayList<String>());
 
-        HtmlPage page = getHtmlPage(getLineUrl(lineNumber, direction));
+        HtmlPage page = getHtmlPage(urlCreator.getLineUrl(lineNumber, direction));
 
         List<HtmlTableRow> items = (List<HtmlTableRow>) page.getByXPath("//tr[@style=' margin-bottom: 10px; ']");
 
@@ -260,5 +217,24 @@ public class CracowParser implements IParser
         ArrayList<String> values = new ArrayList<>(Arrays.asList(stringValues));
 
         return !values.isEmpty() ? values : null;
+    }
+
+    public static HtmlPage getHtmlPage(String url) throws Exception
+    {
+        WebClient client = new WebClient();
+        client.getOptions().setCssEnabled(true);
+        client.getOptions().setJavaScriptEnabled(false);
+
+        HtmlPage page = null;
+        try
+        {
+            page = client.getPage(url);
+        }
+        catch (IOException e)
+        {
+            throw new Exception("Cannot parse page from url: \"" + url + "\".");
+        }
+
+        return page;
     }
 }

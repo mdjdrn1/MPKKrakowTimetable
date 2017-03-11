@@ -1,7 +1,6 @@
 package com.github.mdjdrn1.MPKKrakowTimetable.test;
 
-import com.github.mdjdrn1.MPKKrakowTimetable.CracowParser;
-import com.github.mdjdrn1.MPKKrakowTimetable.IParser;
+import com.github.mdjdrn1.MPKKrakowTimetable.CracowLine;
 import com.github.mdjdrn1.MPKKrakowTimetable.structures.Direction;
 import com.github.mdjdrn1.MPKKrakowTimetable.structures.Stop;
 import org.junit.jupiter.api.Test;
@@ -12,45 +11,34 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CracowParserTest
+public class CracowLineTest
 {
     @Test
     void linesNumbersListShouldHave5thItemEqual5() throws Exception
     {
-        IParser parser = new CracowParser();
-        List<Integer> lines = parser.getLinesNumbersList();
+        List<Integer> lines = CracowLine.getLineNumbersList();
         assertThat(lines.get(4)).isEqualTo(5);
     }
 
     @Test
     void linesNumbersListShouldContain18() throws Exception
     {
-        IParser parser = new CracowParser();
-        List<Integer> lines = parser.getLinesNumbersList();
+        List<Integer> lines = CracowLine.getLineNumbersList();
         assertThat(lines.contains(18));
-    }
-
-    @Test
-    void shouldReturnValidLine52URL() throws Exception
-    {
-        CracowParser parser = new CracowParser();
-
-        assertThat(parser.getLineUrl(52)).matches(".*lang=(PL|EN|DE)&rozklad=\\d{8}&linia=52$");
     }
 
     @Test
     void directionsListFor116() throws Exception
     {
-
-        IParser parser = new CracowParser();
-
         List<Direction> expectedDirections = new ArrayList<>(
                 Arrays.asList(
                         new Direction("Kozienicka", 1),
                         new Direction("Czerwone Maki P+R", 2)
                 )
         );
-        List<Direction> actualDirections = parser.getDirectionsList(116);
+
+        CracowLine line = new CracowLine(116);
+        List<Direction> actualDirections = line.getDirectionsList();
         assertThat(actualDirections).isEqualTo(expectedDirections);
     }
 
@@ -58,23 +46,20 @@ public class CracowParserTest
     @Test
     void directionsListLine451() throws Exception
     {
-
-        IParser parser = new CracowParser();
-
         List<Direction> expectedDirections = new ArrayList<>(
                 Arrays.asList(
                         new Direction("Judyma Szkoła", 1)
                 )
         );
-        List<Direction> actualDirections = parser.getDirectionsList(451);
+
+        CracowLine line = new CracowLine(451);
+        List<Direction> actualDirections = line.getDirectionsList();
         assertThat(actualDirections).isEqualTo(expectedDirections);
     }
 
     @Test
     void stopsListLine116() throws Exception
     {
-        IParser parser = new CracowParser();
-
         List<Stop> expectedStops = new ArrayList<>(
                 Arrays.asList(
                         new Stop("Czerwone Maki P+R", 1),
@@ -87,8 +72,9 @@ public class CracowParserTest
                 )
         );
 
-        Direction direction = parser.getDirectionsList(116).get(0);
-        List<Stop> actualStops = parser.getStopsList(116, direction);
+        CracowLine line = new CracowLine(116);
+        Direction direction = line.getDirectionsList().get(0);
+        List<Stop> actualStops = line.getStopsList(direction);
 
         assertThat(actualStops).isEqualTo(expectedStops);
     }
@@ -96,8 +82,6 @@ public class CracowParserTest
     @Test
     void stopsListLine100() throws Exception
     {
-        IParser parser = new CracowParser();
-
         List<Stop> expectedStops = new ArrayList<>(
                 Arrays.asList(
                         new Stop("Salwator", 1),
@@ -106,8 +90,9 @@ public class CracowParserTest
                 )
         );
 
-        Direction direction = parser.getDirectionsList(100).get(0);
-        List<Stop> actualStops = parser.getStopsList(100, direction);
+        CracowLine line = new CracowLine(100);
+        Direction direction = line.getDirectionsList().get(0);
+        List<Stop> actualStops = line.getStopsList(direction);
 
         assertThat(actualStops).isEqualTo(expectedStops);
     }
@@ -116,7 +101,6 @@ public class CracowParserTest
     void timetableLine213() throws Exception
     {
         // TODO: run test only if timetable didn't change (assume?)
-        CracowParser parser = new CracowParser();
 
         ArrayList<ArrayList<List<String>>> expectedTimetable = new ArrayList<>(3);
 
@@ -153,9 +137,10 @@ public class CracowParserTest
         expectedTimetable.get(2).set(20, Arrays.asList("25"));
         expectedTimetable.get(2).set(22, Arrays.asList("05"));
 
-        Direction direction = parser.getDirectionsList(213).get(0);
-        Stop stop = parser.getStopsList(213, direction).get(0);
-        ArrayList<ArrayList<List<String>>> actualTimetable = parser.getTimetable(213, direction, stop);
+        CracowLine line = new CracowLine(213);
+        Direction direction = line.getDirectionsList().get(0);
+        Stop stop = line.getStopsList(direction).get(0);
+        ArrayList<ArrayList<List<String>>> actualTimetable = line.getTimetable(direction, stop);
 
         assertThat(actualTimetable).isEqualTo(expectedTimetable);
     }
