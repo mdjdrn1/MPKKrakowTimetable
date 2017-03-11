@@ -10,9 +10,18 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class CracowLineTest
 {
+    @Test
+    void shouldThrowExceptionForNonExistingLine() throws Exception
+    {
+        assertThatThrownBy(() -> new CracowLine(10000))
+                .isInstanceOf(Exception.class)
+                .hasMessage("Line " + 10000 + " doesn't exist.");
+    }
+
     @Test
     void linesNumbersListShouldHave5thItemEqual5() throws Exception
     {
@@ -41,7 +50,6 @@ public class CracowLineTest
         List<Direction> actualDirections = line.getDirectionsList();
         assertThat(actualDirections).isEqualTo(expectedDirections);
     }
-
 
     @Test
     void directionsListLine451() throws Exception
