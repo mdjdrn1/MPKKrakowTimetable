@@ -6,16 +6,11 @@ import com.github.mdjdrn1.MPKKrakowTimetable.structures.Direction;
 import com.github.mdjdrn1.MPKKrakowTimetable.structures.Stop;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class CracowLine implements ILine
 {
     private static List<Integer> lineNumbersList;
-    private static CracowURLCreator urlCreator = new CracowURLCreator();
-    private final Integer lineNumber;
-
     static
     {
         try
@@ -27,6 +22,9 @@ public class CracowLine implements ILine
             System.out.println("Failed initializing static CracowLine members.");
         }
     }
+
+    private static CracowURLCreator urlCreator = new CracowURLCreator();
+    private final Integer lineNumber;
 
     public static List<Integer> getLineNumbersList() throws Exception
     {
@@ -62,6 +60,15 @@ public class CracowLine implements ILine
             throw new Exception("Line " + lineNumber + " doesn't exist.");
 
         this.lineNumber = lineNumber;
+    }
+
+    public boolean isNightLine()
+    {
+        boolean isTramNightLine = lineNumber >= 60 || lineNumber < 70;
+        boolean isBusUrbanNightLine = lineNumber >= 600 || lineNumber < 700;
+        boolean isBusAgglomerationNightLine = lineNumber >= 900 || lineNumber < 1000;
+
+        return isTramNightLine || isBusUrbanNightLine || isBusAgglomerationNightLine;
     }
 
     @Override
@@ -142,7 +149,7 @@ public class CracowLine implements ILine
 
     /**
      * @return ArrayList (size up to 3 - index 0: weekday; index 1: saturdays; index 2: holidays)
-     * of ArrayLists - representing hour (size 24 for day lines; size 8 for night lines)
+     * of ArrayLists - representing hour (size 24)
      * of List<String> (representing departure minutes)
      */
     @Override
@@ -153,12 +160,19 @@ public class CracowLine implements ILine
 
         ArrayList<ArrayList<List<String>>> timetable = new ArrayList<>(3);
 
+        int hoursInTimetable = 24;
         while (timetable.size() < 3)
-            timetable.add(new ArrayList<List<String>>(24));
+        {
+            timetable.add(new ArrayList<List<String>>(hoursInTimetable));
+        }
 
         for (int i = 0; i < timetable.size(); ++i)
-            while (timetable.get(i).size() < 24)
+        {
+            while (timetable.get(i).size() < hoursInTimetable)
+            {
                 timetable.get(i).add(new ArrayList<String>());
+            }
+        }
 
         HtmlPage page = getHtmlPage(urlCreator.getLineUrl(lineNumber, direction));
 
@@ -193,7 +207,6 @@ public class CracowLine implements ILine
         }
         return timetable;
     }
-
 
     private static Integer getTableCellValue(HtmlTableCell item)
     {
