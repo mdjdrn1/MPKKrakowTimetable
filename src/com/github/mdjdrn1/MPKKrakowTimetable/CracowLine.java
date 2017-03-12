@@ -37,7 +37,7 @@ public class CracowLine implements ILine
         List<HtmlTableCell> items = (List<HtmlTableCell>) page.getByXPath("//td[@class='linia_table_left']");
 
         if (items == null)
-            throw new Exception("getLineNumbersList() exception. Cannot find td class='linia_table_left'.");
+            throw new Exception("getLineNumbersList() exception. Cannot parse line numbers.");
         else
         {
             for (HtmlElement htmlItem : items)
@@ -46,7 +46,7 @@ public class CracowLine implements ILine
                 for (HtmlAnchor item : itemAnchor)
                 {
                     if (item == null)
-                        throw new Exception("getLineNumbersList() exception. Lines numbers parsing error.");
+                        throw new Exception("getLineNumbersList() exception. Cannot parse line numbers");
                     else
                         lineNumbers.add(Integer.valueOf(item.asText()));
                 }
@@ -82,33 +82,26 @@ public class CracowLine implements ILine
 
         HtmlParagraph paragraph = (HtmlParagraph) page.getFirstByXPath("//p[contains(@style,'font-size: 40px;')]");
         if (paragraph == null)
-            throw new Exception("getDirectionsList() exception. Cannot found paragraph.");
+            throw new Exception("getDirectionsList() exception. Cannot parse directions.");
 
-        List<HtmlTableCell> items = (List<HtmlTableCell>) paragraph.getByXPath("../../../td[@style='text-align: left; white-space: nowrap; ']");
-        if (items == null)
-            throw new Exception("getDirectionsList() exception. Cannot find table cell.");
-        else
+        List<HtmlAnchor> itemAnchor = (List<HtmlAnchor>) paragraph.getByXPath("../../../td[@style='text-align: left; white-space: nowrap; ']/a");
+
+        if (itemAnchor.size() == 0)
         {
-            List<HtmlAnchor> itemAnchor = (List<HtmlAnchor>) items.get(0).getByXPath("./a");
+            throw new Exception("getDirectionsList() exception. Cannot parse directions.");
+        }
 
+        int id = 1;
 
-            if (itemAnchor.size() == 0)
-            {
-                throw new Exception("getDirectionsList() exception. Directions parsing error.");
-            }
+        for (HtmlAnchor anchor : itemAnchor)
+        {
+            String directionName = anchor.asText();
+            if (id % 2 == 1)
+                directionName = directionName.substring(directionName.lastIndexOf('-') + 1).trim();
+            else
+                directionName = directionName.substring(directionName.lastIndexOf('-') + 1).trim();
 
-            int id = 1;
-
-            for (HtmlAnchor anchor : itemAnchor)
-            {
-                String directionName = anchor.asText();
-                if (id % 2 == 1)
-                    directionName = directionName.substring(directionName.lastIndexOf('-') + 1).trim();
-                else
-                    directionName = directionName.substring(directionName.lastIndexOf('-') + 1).trim();
-
-                directions.add(new Direction(directionName, id++));
-            }
+            directions.add(new Direction(directionName, id++));
         }
 
         return directions;
@@ -121,28 +114,19 @@ public class CracowLine implements ILine
 
         HtmlPage page = getHtmlPage(urlCreator.getLineUrl(lineNumber, direction));
 
-        List<HtmlTableCell> items = (List<HtmlTableCell>) page.getByXPath("//td[@style=' text-align: right; ']");
+        List<HtmlAnchor> htmlAnchors = (List<HtmlAnchor>) page.getByXPath("//td[@style=' text-align: right; ']/a");
 
-        if (items == null)
-            throw new Exception("getStopsList() exception. Cannot find table cell.");
-        else
+        if (htmlAnchors == null)
+            throw new Exception("getStopsList() exception. Cannot parse stops.");
+
+        for (HtmlAnchor item : htmlAnchors)
         {
-
-            for (HtmlElement htmlItem : items)
+            if (item != null)
             {
-                List<HtmlAnchor> htmlAnchors = (List<HtmlAnchor>) htmlItem.getByXPath("./a");
-                if (htmlAnchors == null)
-                    throw new Exception("getStopsList() exception. Cannot find anchors.");
-                for (HtmlAnchor item : htmlAnchors)
-                {
-                    if (item != null)
-                    {
-                        String stopName = item.asText();
-                        Integer stopID = Integer.valueOf(item.getHrefAttribute().split("\\d__\\d")[1].replaceFirst("__", ""));
+                String stopName = item.asText();
+                Integer stopID = Integer.valueOf(item.getHrefAttribute().split("\\d__\\d")[1].replaceFirst("__", ""));
 
-                        stopsList.add(new Stop(stopName, stopID));
-                    }
-                }
+                stopsList.add(new Stop(stopName, stopID));
             }
         }
 
@@ -176,31 +160,30 @@ public class CracowLine implements ILine
 
         if (items == null || items.isEmpty())
         {
-            throw new Exception("getTimetables() exception. Cannot find tr style=margin-bottom: 10px;");
+            throw new Exception("getStopsList() exception. Cannot parse stops.");
         }
-        else
+
+        for (HtmlElement htmlItem : items)
         {
-            for (HtmlElement htmlItem : items)
+            List<HtmlTableCell> tableCells = (List<HtmlTableCell>) htmlItem.getByXPath("../tr/td");
+
+            for (int i = 5; i + 3 < tableCells.size(); i += 4)
             {
-                List<HtmlTableCell> tableCells = (List<HtmlTableCell>) htmlItem.getByXPath("../tr/td");
+                HtmlTableCell item = tableCells.get(i);
+                Integer hour = getTableCellValue(item);
 
-                for (int i = 5; i + 3 < tableCells.size(); i += 4)
+                if (hour == null)
+                    break;
+
+                for (int k = 0; k < 3; ++k)
                 {
-                    HtmlTableCell item = tableCells.get(i);
-                    Integer hour = getTableCellValue(item);
-
-                    if (hour == null)
-                        break;
-
-                    for (int k = 0; k < 3; ++k)
-                    {
-                        ArrayList<String> minutes = getAllTableCellValues(tableCells.get(i + k + 1));
-                        if (minutes != null && !minutes.isEmpty())
-                            timetableList.get(k).setMinutes(hour, minutes);
-                    }
+                    ArrayList<String> minutes = getAllTableCellValues(tableCells.get(i + k + 1));
+                    if (minutes != null && !minutes.isEmpty())
+                        timetableList.get(k).setMinutes(hour, minutes);
                 }
             }
         }
+
         return timetableList;
     }
 
@@ -231,7 +214,7 @@ public class CracowLine implements ILine
     public static HtmlPage getHtmlPage(String url) throws Exception
     {
         WebClient client = new WebClient();
-        client.getOptions().setCssEnabled(true);
+        client.getOptions().setCssEnabled(false);
         client.getOptions().setJavaScriptEnabled(false);
 
         HtmlPage page = null;

@@ -1,6 +1,7 @@
 package com.github.mdjdrn1.MPKKrakowTimetable.structures;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class Timetable
@@ -28,7 +29,7 @@ public class Timetable
 
         while (timetableList.size() < HOURS)
         {
-            timetableList.add(new ArrayList<String>());
+            timetableList.add(new ArrayList<>());
         }
 
         return timetableList;
@@ -94,12 +95,12 @@ public class Timetable
 
         for(List<String> list : timetableList1)
         {
-            list.sort((lhs, rhs) -> Integer.parseInt(lhs.substring(0, 2)) - Integer.parseInt(rhs.substring(0, 2)));
+            list.sort(Comparator.comparingInt(min -> Integer.parseInt(min.substring(0, 2))));
         }
 
         for(List<String> list : timetableList2)
         {
-            list.sort((lhs, rhs) -> Integer.parseInt(lhs.substring(0, 2)) - Integer.parseInt(rhs.substring(0, 2)));
+            list.sort(Comparator.comparingInt(min -> Integer.parseInt(min.substring(0, 2))));
         }
 
         return timetableList1.equals(timetableList2);
