@@ -4,6 +4,7 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
 import com.github.mdjdrn1.MPKKrakowTimetable.structures.Direction;
 import com.github.mdjdrn1.MPKKrakowTimetable.structures.Stop;
+import com.github.mdjdrn1.MPKKrakowTimetable.structures.Timetable;
 
 import java.io.IOException;
 import java.util.*;
@@ -11,6 +12,7 @@ import java.util.*;
 public class CracowLine implements ILine
 {
     private static List<Integer> lineNumbersList;
+
     static
     {
         try
@@ -56,7 +58,7 @@ public class CracowLine implements ILine
 
     public CracowLine(int lineNumber) throws Exception
     {
-        if(!lineNumbersList.contains(lineNumber))
+        if (!lineNumbersList.contains(lineNumber))
             throw new Exception("Line " + lineNumber + " doesn't exist.");
 
         this.lineNumber = lineNumber;
@@ -153,26 +155,20 @@ public class CracowLine implements ILine
      * of List<String> (representing departure minutes)
      */
     @Override
-    public ArrayList<ArrayList<List<String>>> getTimetable(Direction direction, Stop stop) throws Exception
+    public ArrayList<Timetable> getTimetables(Direction direction, Stop stop) throws Exception
     {
         // TODO: doesn't work for timetable with only weekday or only weekday and saturday
         // TODO: take into account, some lines (e.g night lines) have timetable for all days of week or only friday/saturday etc.
 
-        ArrayList<ArrayList<List<String>>> timetable = new ArrayList<>(3);
+        // TODO: detect size of timetableList
+        int amountOfTimetables = 3;
+        ArrayList<Timetable> timetableList = new ArrayList<>(amountOfTimetables);
 
-        int hoursInTimetable = 24;
-        while (timetable.size() < 3)
+        while (timetableList.size() < amountOfTimetables)
         {
-            timetable.add(new ArrayList<List<String>>(hoursInTimetable));
+            timetableList.add(new Timetable());
         }
 
-        for (int i = 0; i < timetable.size(); ++i)
-        {
-            while (timetable.get(i).size() < hoursInTimetable)
-            {
-                timetable.get(i).add(new ArrayList<String>());
-            }
-        }
 
         HtmlPage page = getHtmlPage(urlCreator.getLineUrl(lineNumber, direction));
 
@@ -180,7 +176,7 @@ public class CracowLine implements ILine
 
         if (items == null || items.isEmpty())
         {
-            throw new Exception("getTimetable() exception. Cannot find tr style=margin-bottom: 10px;");
+            throw new Exception("getTimetables() exception. Cannot find tr style=margin-bottom: 10px;");
         }
         else
         {
@@ -200,12 +196,12 @@ public class CracowLine implements ILine
                     {
                         ArrayList<String> minutes = getAllTableCellValues(tableCells.get(i + k + 1));
                         if (minutes != null && !minutes.isEmpty())
-                            timetable.get(k).set(hour, minutes);
+                            timetableList.get(k).setMinutes(hour, minutes);
                     }
                 }
             }
         }
-        return timetable;
+        return timetableList;
     }
 
     private static Integer getTableCellValue(HtmlTableCell item)

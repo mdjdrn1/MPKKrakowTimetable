@@ -3,6 +3,7 @@ package com.github.mdjdrn1.MPKKrakowTimetable.test;
 import com.github.mdjdrn1.MPKKrakowTimetable.CracowLine;
 import com.github.mdjdrn1.MPKKrakowTimetable.structures.Direction;
 import com.github.mdjdrn1.MPKKrakowTimetable.structures.Stop;
+import com.github.mdjdrn1.MPKKrakowTimetable.structures.Timetable;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -110,45 +111,39 @@ public class CracowLineTest
     {
         // TODO: run test only if timetable didn't change (assume?)
 
-        ArrayList<ArrayList<List<String>>> expectedTimetable = new ArrayList<>(3);
+        ArrayList<Timetable> expectedTimetable = new ArrayList<>(3);
 
         while(expectedTimetable.size() < 3)
-            expectedTimetable.add(new ArrayList<List<String>>(24));
+            expectedTimetable.add(new Timetable());
 
-        for(int i = 0; i < expectedTimetable.size(); ++i)
-        {
-            while(expectedTimetable.get(i).size() < 24)
-                expectedTimetable.get(i).add(new ArrayList<String>());
-        }
+        expectedTimetable.get(0).addMinutes(4, Arrays.asList("00", "50"));
+        expectedTimetable.get(0).addMinutes(6, "10");
+        expectedTimetable.get(0).addMinutes(7, "10");
+        expectedTimetable.get(0).addMinutes(8, "20");
+        expectedTimetable.get(0).addMinutes(10, "05");
+        expectedTimetable.get(0).addMinutes(12, "30");
+        expectedTimetable.get(0).addMinutes(14, Arrays.asList("10", "45"));
+        expectedTimetable.get(0).addMinutes(15, "50");
+        expectedTimetable.get(0).addMinutes(16, "45");
+        expectedTimetable.get(0).addMinutes(17, "30");
+        expectedTimetable.get(0).addMinutes(18, "35");
+        expectedTimetable.get(0).addMinutes(19, "30");
+        expectedTimetable.get(0).addMinutes(22, "25");
 
-        expectedTimetable.get(0).set(4, Arrays.asList("00", "50"));
-        expectedTimetable.get(0).set(6, Arrays.asList("10"));
-        expectedTimetable.get(0).set(7, Arrays.asList("10"));
-        expectedTimetable.get(0).set(8, Arrays.asList("20"));
-        expectedTimetable.get(0).set(10, Arrays.asList("05"));
-        expectedTimetable.get(0).set(12, Arrays.asList("30"));
-        expectedTimetable.get(0).set(14, Arrays.asList("10", "45"));
-        expectedTimetable.get(0).set(15, Arrays.asList("50"));
-        expectedTimetable.get(0).set(16, Arrays.asList("45"));
-        expectedTimetable.get(0).set(17, Arrays.asList("30"));
-        expectedTimetable.get(0).set(18, Arrays.asList("35"));
-        expectedTimetable.get(0).set(19, Arrays.asList("30"));
-        expectedTimetable.get(0).set(22, Arrays.asList("25"));
+        expectedTimetable.get(1).addMinutes(4, "20");
+        expectedTimetable.get(1).addMinutes(6, "00");
+        expectedTimetable.get(1).addMinutes(20, "25");
+        expectedTimetable.get(1).addMinutes(22, "05");
 
-        expectedTimetable.get(1).set(4, Arrays.asList("20"));
-        expectedTimetable.get(1).set(6, Arrays.asList("00"));
-        expectedTimetable.get(1).set(20, Arrays.asList("25"));
-        expectedTimetable.get(1).set(22, Arrays.asList("05"));
-
-        expectedTimetable.get(2).set(4, Arrays.asList("20"));
-        expectedTimetable.get(2).set(6, Arrays.asList("00"));
-        expectedTimetable.get(2).set(20, Arrays.asList("25"));
-        expectedTimetable.get(2).set(22, Arrays.asList("05"));
+        expectedTimetable.get(2).addMinutes(4, "20");
+        expectedTimetable.get(2).addMinutes(6, "00");
+        expectedTimetable.get(2).addMinutes(20, "25");
+        expectedTimetable.get(2).addMinutes(22, "05");
 
         CracowLine line = new CracowLine(213);
         Direction direction = line.getDirectionsList().get(0);
         Stop stop = line.getStopsList(direction).get(0);
-        ArrayList<ArrayList<List<String>>> actualTimetable = line.getTimetable(direction, stop);
+        ArrayList<Timetable> actualTimetable = line.getTimetables(direction, stop);
 
         assertThat(actualTimetable).isEqualTo(expectedTimetable);
     }
@@ -156,39 +151,33 @@ public class CracowLineTest
     @Test
     void timetableNightLine605() throws Exception
     {
-        ArrayList<ArrayList<List<String>>> expectedTimetable = new ArrayList<>(3);
+        ArrayList<Timetable> expectedTimetable = new ArrayList<>(3);
 
         while(expectedTimetable.size() < 3)
-            expectedTimetable.add(new ArrayList<List<String>>(24));
+            expectedTimetable.add(new Timetable());
 
-        for(int i = 0; i < expectedTimetable.size(); ++i)
-        {
-            while(expectedTimetable.get(i).size() < 24)
-                expectedTimetable.get(i).add(new ArrayList<String>());
-        }
+        expectedTimetable.get(0).addMinutes(23, "31A");
+        expectedTimetable.get(0).addMinutes(0, "31A");
+        expectedTimetable.get(0).addMinutes(1, "31A");
+        expectedTimetable.get(0).addMinutes(2, "31A");
+        expectedTimetable.get(0).addMinutes(3, "31A");
 
-        expectedTimetable.get(0).set(23, Arrays.asList("31A"));
-        expectedTimetable.get(0).set(0, Arrays.asList("31A"));
-        expectedTimetable.get(0).set(1, Arrays.asList("31A"));
-        expectedTimetable.get(0).set(2, Arrays.asList("31A"));
-        expectedTimetable.get(0).set(3, Arrays.asList("31A"));
+        expectedTimetable.get(1).addMinutes(23, "31A");
+        expectedTimetable.get(1).addMinutes(0, "31");
+        expectedTimetable.get(1).addMinutes(1, "31");
+        expectedTimetable.get(1).addMinutes(2, "31A");
+        expectedTimetable.get(1).addMinutes(3, "31A");
 
-        expectedTimetable.get(1).set(23, Arrays.asList("31A"));
-        expectedTimetable.get(1).set(0, Arrays.asList("31"));
-        expectedTimetable.get(1).set(1, Arrays.asList("31"));
-        expectedTimetable.get(1).set(2, Arrays.asList("31A"));
-        expectedTimetable.get(1).set(3, Arrays.asList("31A"));
-
-        expectedTimetable.get(2).set(23, Arrays.asList("31A"));
-        expectedTimetable.get(2).set(0, Arrays.asList("31A"));
-        expectedTimetable.get(2).set(1, Arrays.asList("31A"));
-        expectedTimetable.get(2).set(2, Arrays.asList("31A"));
-        expectedTimetable.get(2).set(3, Arrays.asList("31A"));
+        expectedTimetable.get(2).addMinutes(23, "31A");
+        expectedTimetable.get(2).addMinutes(0, "31A");
+        expectedTimetable.get(2).addMinutes(1, "31A");
+        expectedTimetable.get(2).addMinutes(2, "31A");
+        expectedTimetable.get(2).addMinutes(3, "31A");
 
         CracowLine line = new CracowLine(605);
         Direction direction = line.getDirectionsList().get(0);
         Stop stop = line.getStopsList(direction).get(0);
-        ArrayList<ArrayList<List<String>>> actualTimetable = line.getTimetable(direction, stop);
+        ArrayList<Timetable> actualTimetable = line.getTimetables(direction, stop);
 
         assertThat(actualTimetable).isEqualTo(expectedTimetable);
     }
