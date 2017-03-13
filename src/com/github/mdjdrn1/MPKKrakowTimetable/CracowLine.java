@@ -17,7 +17,7 @@ public class CracowLine implements ILine
     {
         try
         {
-            lineNumbersList = getLineNumbersList();
+            lineNumbersList = setLineNumbersList();
         }
         catch (Exception e)
         {
@@ -28,7 +28,7 @@ public class CracowLine implements ILine
     private static CracowURLCreator urlCreator = new CracowURLCreator();
     private final Integer lineNumber;
 
-    public static List<Integer> getLineNumbersList() throws Exception
+    public static List<Integer> setLineNumbersList() throws Exception
     {
         List<Integer> lineNumbers = new ArrayList<>();
 
@@ -56,6 +56,11 @@ public class CracowLine implements ILine
         return lineNumbers;
     }
 
+    public List<Integer> getLineNumbersList()
+    {
+        return lineNumbersList;
+    }
+
     public CracowLine(int lineNumber) throws Exception
     {
         if (!lineNumbersList.contains(lineNumber))
@@ -71,6 +76,12 @@ public class CracowLine implements ILine
         boolean isBusAgglomerationNightLine = lineNumber >= 900 || lineNumber < 1000;
 
         return isTramNightLine || isBusUrbanNightLine || isBusAgglomerationNightLine;
+    }
+
+    @Override
+    public int getLineNumber()
+    {
+        return lineNumber;
     }
 
     @Override
@@ -141,20 +152,15 @@ public class CracowLine implements ILine
     @Override
     public ArrayList<Timetable> getTimetables(Direction direction, Stop stop) throws Exception
     {
-        // TODO: doesn't work for timetable with only weekday or only weekday and saturday
-        // TODO: take into account, some lines (e.g night lines) have timetable for all days of week or only friday/saturday etc.
+        HtmlPage page = getHtmlPage(urlCreator.getLineUrl(lineNumber, direction, stop));
 
-        // TODO: detect size of timetableList
-        int amountOfTimetables = 3;
+        int amountOfTimetables = amountOfTimetablesOnPage(page);
         ArrayList<Timetable> timetableList = new ArrayList<>(amountOfTimetables);
 
         while (timetableList.size() < amountOfTimetables)
         {
             timetableList.add(new Timetable());
         }
-
-
-        HtmlPage page = getHtmlPage(urlCreator.getLineUrl(lineNumber, direction));
 
         List<HtmlTableRow> items = (List<HtmlTableRow>) page.getByXPath("//tr[@style=' margin-bottom: 10px; ']");
 
@@ -166,8 +172,7 @@ public class CracowLine implements ILine
         for (HtmlElement htmlItem : items)
         {
             List<HtmlTableCell> tableCells = (List<HtmlTableCell>) htmlItem.getByXPath("../tr/td");
-
-            for (int i = 5; i + 3 < tableCells.size(); i += 4)
+            for (int i = 5; i + amountOfTimetables < tableCells.size(); i += amountOfTimetables + 1)
             {
                 HtmlTableCell item = tableCells.get(i);
                 Integer hour = getTableCellValue(item);
@@ -175,7 +180,7 @@ public class CracowLine implements ILine
                 if (hour == null)
                     break;
 
-                for (int k = 0; k < 3; ++k)
+                for (int k = 0; k < amountOfTimetables; ++k)
                 {
                     ArrayList<String> minutes = getAllTableCellValues(tableCells.get(i + k + 1));
                     if (minutes != null && !minutes.isEmpty())
@@ -185,6 +190,14 @@ public class CracowLine implements ILine
         }
 
         return timetableList;
+    }
+
+    private int amountOfTimetablesOnPage(HtmlPage page)
+    {
+        List<HtmlTableCell> cells = (List<HtmlTableCell>) page.getByXPath("//tr[@style=' margin-bottom: 10px; ']/td");
+        int amountOfTimetables = cells.size() - 2;
+
+        return amountOfTimetables;
     }
 
     private static Integer getTableCellValue(HtmlTableCell item)
