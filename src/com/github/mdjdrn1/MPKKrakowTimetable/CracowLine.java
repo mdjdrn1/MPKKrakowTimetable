@@ -14,14 +14,13 @@ public class CracowLine extends XPathParser implements ILine
 {
     private final int lineNumber;
 
-
     private static CracowURLCreator urlCreator = new CracowURLCreator();
 
     public List<Integer> getLineNumbersList() throws Exception
     {
         List<Integer> lineNumbers = new ArrayList<>();
 
-        HtmlPage page = getHtmlPage(urlCreator.getHomePage());
+        HtmlPage page = getHtmlPage(CracowURLCreator.getHomePage());
 
         List<HtmlTableCell> items = (List<HtmlTableCell>) page.getByXPath("//td[@class='linia_table_left']");
 
@@ -75,7 +74,7 @@ public class CracowLine extends XPathParser implements ILine
 
         HtmlPage page = getHtmlPage(urlCreator.getLineUrl(lineNumber));
 
-        HtmlParagraph paragraph = (HtmlParagraph) page.getFirstByXPath("//p[contains(@style,'font-size: 40px;')]");
+        HtmlParagraph paragraph = page.getFirstByXPath("//p[contains(@style,'font-size: 40px;')]");
         if (paragraph == null)
             throw new Exception("getDirectionsList() exception. Cannot parse directions.");
 
@@ -120,12 +119,27 @@ public class CracowLine extends XPathParser implements ILine
             {
                 String stopName = item.asText();
                 Integer stopID = Integer.valueOf(item.getHrefAttribute().split("\\d__\\d")[1].replaceFirst("__", ""));
+                boolean onDemand = isStopOnDemand(item);
 
-                stopsList.add(new Stop(stopName, stopID));
+                stopsList.add(new Stop(stopName, stopID, onDemand));
             }
         }
 
         return stopsList;
+    }
+
+    private boolean isStopOnDemand(HtmlAnchor item)
+    {
+        List<HtmlTableCell> cells = ((List<HtmlTableCell>) item.getByXPath("../../td"));
+        HtmlTableCell onDemandCell = cells.size() >= 3 ? cells.get(2) : null;
+        boolean onDemand = false;
+
+        if (onDemandCell != null && onDemandCell.asText().equals("NZ"))
+        {
+            onDemand = true;
+        }
+
+        return onDemand;
     }
 
     /**
@@ -172,10 +186,10 @@ public class CracowLine extends XPathParser implements ILine
         }
 
         ArrayList<String> descriptions = getTimetablesDescriptions(indexOfFirstHour, amountOfTimetables, cells);
-        if(descriptions.size() != amountOfTimetables)
+        if (descriptions.size() != amountOfTimetables)
             throw new Exception("getStopsList() exception. Cannot parse descriptions for timetables.");
 
-        for(int i = 0; i < amountOfTimetables; ++i)
+        for (int i = 0; i < amountOfTimetables; ++i)
         {
             timetableList.get(i).setDescription(descriptions.get(i));
         }
@@ -216,10 +230,10 @@ public class CracowLine extends XPathParser implements ILine
     {
         ArrayList<String> descriptions = new ArrayList<>();
 
-        for(int i = 0; i < indexOfFirstHour && amountOfTimetables > 0; ++i)
+        for (int i = 0; i < indexOfFirstHour && amountOfTimetables > 0; ++i)
         {
             String cellText = cells.get(i).asText();
-            if(!cellText.isEmpty() && !cellText.equals("Hour"))
+            if (!cellText.isEmpty() && !cellText.equals("Hour"))
             {
                 descriptions.add(cellText);
                 --amountOfTimetables;

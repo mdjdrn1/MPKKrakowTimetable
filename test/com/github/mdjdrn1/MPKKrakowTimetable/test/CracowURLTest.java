@@ -28,7 +28,9 @@ public class CracowURLTest
         Stop stop = line.getStopsList(direction).get(stopID - 1);
 
         CracowURLCreator cracowURLCreator = new CracowURLCreator();
-        assertThat(cracowURLCreator.getLineUrl(lineNumber, direction, stop))
+        String actualURL = cracowURLCreator.getLineUrl(lineNumber, direction, stop);
+
+        assertThat(actualURL)
                 .matches(".*lang=(PL|EN|DE)&rozklad=\\d{8}&linia=" + lineNumber + "__" + directionID + "__" + stopID);
     }
 }

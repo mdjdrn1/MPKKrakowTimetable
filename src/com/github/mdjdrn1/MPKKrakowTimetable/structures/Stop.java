@@ -2,14 +2,21 @@ package com.github.mdjdrn1.MPKKrakowTimetable.structures;
 
 public class Stop
 {
-    private String name;
-    private Integer id;
+    private final String name;
+    private final Integer id;
+    private final boolean onDemand;
     // TODO: add delay
 
     public Stop(String name, Integer id)
     {
+        this(name, id, false);
+    }
+
+    public Stop(String name, Integer id, boolean onDemand)
+    {
         this.name = name;
         this.id = id;
+        this.onDemand = onDemand;
     }
 
     public String getName()
@@ -17,28 +24,29 @@ public class Stop
         return name;
     }
 
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
     public Integer getId()
     {
         return id;
     }
 
-    public void setId(Integer id)
+    public boolean isOnDemand()
     {
-        this.id = id;
+        return onDemand;
     }
 
     @Override
     public String toString()
     {
-        return "Stop{" +
+        String string = "Stop{" +
                 "name='" + name + '\'' +
-                ", id=" + id +
-                '}';
+                ", id=" + id;
+
+        if(onDemand)
+            string += ", onDemand";
+
+        string += '}';
+
+        return string;
     }
 
     @Override
@@ -49,6 +57,7 @@ public class Stop
 
         Stop stop = (Stop) o;
 
+        if (onDemand != stop.onDemand) return false;
         if (name != null ? !name.equals(stop.name) : stop.name != null) return false;
         return id != null ? id.equals(stop.id) : stop.id == null;
     }
@@ -58,6 +67,7 @@ public class Stop
     {
         int result = name != null ? name.hashCode() : 0;
         result = 31 * result + (id != null ? id.hashCode() : 0);
+        result = 31 * result + (onDemand ? 1 : 0);
         return result;
     }
 }

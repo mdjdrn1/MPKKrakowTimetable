@@ -27,7 +27,6 @@ public class CracowURLCreator implements IURLCreator
     {
         String timetableURL;
         HtmlPage page = CracowLine.getHtmlPage(homePage);
-
         HtmlTableCell cell = (HtmlTableCell) page.getFirstByXPath("//td[@class='linia_table_left']");
 
         if (cell == null)

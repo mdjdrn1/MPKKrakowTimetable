@@ -75,7 +75,7 @@ public class CracowLineTest
                 Arrays.asList(
                         new Stop("Czerwone Maki P+R", 1),
                         new Stop("Czerwone Maki P+R", 2),
-                        new Stop("Mochnaniec", 3),
+                        new Stop("Mochnaniec", 3, true),
                         new Stop("Skotniki Szkoła", 4),
                         new Stop("Brücknera", 5),
                         new Stop("Skotniki", 6),
@@ -96,8 +96,8 @@ public class CracowLineTest
         List<Stop> expectedStops = new ArrayList<>(
                 Arrays.asList(
                         new Stop("Salwator", 1),
-                        new Stop("Malczewskiego", 2),
-                        new Stop("Aleja Waszyngtona", 3)
+                        new Stop("Malczewskiego", 2, true),
+                        new Stop("Aleja Waszyngtona", 3, true)
                 )
         );
 
