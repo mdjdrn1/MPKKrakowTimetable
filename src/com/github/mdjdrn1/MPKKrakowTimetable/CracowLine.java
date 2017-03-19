@@ -146,36 +146,38 @@ public class CracowLine extends XPathParser implements ILine
             timetableList.add(new Timetable());
         }
 
-        List<HtmlTableRow> items = (List<HtmlTableRow>) page.getByXPath("//tr[@style=' margin-bottom: 10px; ']");
+        HtmlTableRow row = page.getFirstByXPath("//tr[@style=' margin-bottom: 10px; ']");
+        List<HtmlTableCell> cells = (List<HtmlTableCell>) row.getByXPath("../tr/td");
 
-        if (items == null || items.isEmpty())
+        if (cells.isEmpty())
         {
-            throw new Exception("getStopsList() exception. Cannot parse stops.");
+            throw new Exception("getStopsList() exception. Cannot parse timetable.");
         }
 
-        int rere = 1;
-        for (HtmlElement htmlItem : items)
+        int indexOfFirstHour = findIndexOfFirstHour(cells);
+
+        for (int i = indexOfFirstHour; i + amountOfTimetables < cells.size(); i += amountOfTimetables + 1)
         {
-            List<HtmlTableCell> tableCells = (List<HtmlTableCell>) htmlItem.getByXPath("../tr/td");
+            HtmlTableCell item = cells.get(i);
+            Integer hour = getTableCellValue(item);
+            if (hour == null)
+                break;
 
-            int indexOfFirstHour = 0;
-            while (getTableCellValue(tableCells.get(indexOfFirstHour)) == null)
-                ++indexOfFirstHour;
-
-            for (int i = indexOfFirstHour; i + amountOfTimetables < tableCells.size(); i += amountOfTimetables + 1)
+            for (int k = 0; k < amountOfTimetables; ++k)
             {
-                HtmlTableCell item = tableCells.get(i);
-                Integer hour = getTableCellValue(item);
-                if (hour == null)
-                    break;
-
-                for (int k = 0; k < amountOfTimetables; ++k)
-                {
-                    ArrayList<String> minutes = getAllTableCellValues(tableCells.get(i + k + 1));
-                    if (minutes != null && !minutes.isEmpty())
-                        timetableList.get(k).setMinutes(hour, minutes);
-                }
+                ArrayList<String> minutes = getAllTableCellValues(cells.get(i + k + 1));
+                if (minutes != null && !minutes.isEmpty())
+                    timetableList.get(k).setMinutes(hour, minutes);
             }
+        }
+
+        ArrayList<String> descriptions = getTimetablesDescriptions(indexOfFirstHour, amountOfTimetables, cells);
+        if(descriptions.size() != amountOfTimetables)
+            throw new Exception("getStopsList() exception. Cannot parse descriptions for timetables.");
+
+        for(int i = 0; i < amountOfTimetables; ++i)
+        {
+            timetableList.get(i).setDescription(descriptions.get(i));
         }
 
         return timetableList;
@@ -189,7 +191,16 @@ public class CracowLine extends XPathParser implements ILine
         return amountOfTimetables;
     }
 
-    private static ArrayList<String> getAllTableCellValues(HtmlTableCell item)
+    private int findIndexOfFirstHour(List<HtmlTableCell> tableCells)
+    {
+        int indexOfFirstHour = 0;
+        while (getTableCellValue(tableCells.get(indexOfFirstHour)) == null)
+            ++indexOfFirstHour;
+
+        return indexOfFirstHour;
+    }
+
+    private ArrayList<String> getAllTableCellValues(HtmlTableCell item)
     {
         String itemAsText = item.asText().trim();
         if (itemAsText.isEmpty())
@@ -199,5 +210,22 @@ public class CracowLine extends XPathParser implements ILine
         ArrayList<String> values = new ArrayList<>(Arrays.asList(stringValues));
 
         return !values.isEmpty() ? values : null;
+    }
+
+    private ArrayList<String> getTimetablesDescriptions(int indexOfFirstHour, int amountOfTimetables, List<HtmlTableCell> cells)
+    {
+        ArrayList<String> descriptions = new ArrayList<>();
+
+        for(int i = 0; i < indexOfFirstHour && amountOfTimetables > 0; ++i)
+        {
+            String cellText = cells.get(i).asText();
+            if(!cellText.isEmpty() && !cellText.equals("Hour"))
+            {
+                descriptions.add(cellText);
+                --amountOfTimetables;
+            }
+        }
+
+        return descriptions;
     }
 }

@@ -1,7 +1,6 @@
 package com.github.mdjdrn1.MPKKrakowTimetable.structures;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class Timetable
@@ -38,6 +37,11 @@ public class Timetable
     public String getDescription()
     {
         return description;
+    }
+
+    public void setDescription(String description)
+    {
+        this.description = description;
     }
 
     public List<String> getMinutes(int hour)
@@ -87,28 +91,14 @@ public class Timetable
 
         Timetable timetable = (Timetable) o;
 
-        ArrayList<List<String>> timetableList1 = this.timetableList;
-        ArrayList<List<String>> timetableList2 = timetable.timetableList;
-
-        if(timetableList1 == null)
-            return timetableList2 == null;
-
-        for(List<String> list : timetableList1)
-        {
-            list.sort(Comparator.comparingInt(min -> Integer.parseInt(min.substring(0, 2))));
-        }
-
-        for(List<String> list : timetableList2)
-        {
-            list.sort(Comparator.comparingInt(min -> Integer.parseInt(min.substring(0, 2))));
-        }
-
-        return timetableList1.equals(timetableList2);
+        return (description != null ? description.equals(timetable.description) : timetable.description == null) && (timetableList != null ? timetableList.equals(timetable.timetableList) : timetable.timetableList == null);
     }
 
     @Override
     public int hashCode()
     {
-        return timetableList != null ? timetableList.hashCode() : 0;
+        int result = description != null ? description.hashCode() : 0;
+        result = 31 * result + (timetableList != null ? timetableList.hashCode() : 0);
+        return result;
     }
 }

@@ -118,6 +118,7 @@ public class CracowLineTest
         while (expectedTimetable.size() < 3)
             expectedTimetable.add(new Timetable());
 
+        expectedTimetable.get(0).setDescription("Weekday");
         expectedTimetable.get(0).addMinutes(4, Arrays.asList("00", "50"));
         expectedTimetable.get(0).addMinutes(6, "10");
         expectedTimetable.get(0).addMinutes(7, "10");
@@ -132,11 +133,13 @@ public class CracowLineTest
         expectedTimetable.get(0).addMinutes(19, "30");
         expectedTimetable.get(0).addMinutes(22, "25");
 
+        expectedTimetable.get(1).setDescription("Saturdays");
         expectedTimetable.get(1).addMinutes(4, "20");
         expectedTimetable.get(1).addMinutes(6, "00");
         expectedTimetable.get(1).addMinutes(20, "25");
         expectedTimetable.get(1).addMinutes(22, "05");
 
+        expectedTimetable.get(2).setDescription("Holidays");
         expectedTimetable.get(2).addMinutes(4, "20");
         expectedTimetable.get(2).addMinutes(6, "00");
         expectedTimetable.get(2).addMinutes(20, "25");
@@ -158,18 +161,21 @@ public class CracowLineTest
         while (expectedTimetable.size() < 3)
             expectedTimetable.add(new Timetable());
 
+        expectedTimetable.get(0).setDescription("Mo/Tu - Th/Fr");
         expectedTimetable.get(0).addMinutes(23, "31A");
         expectedTimetable.get(0).addMinutes(0, "31A");
         expectedTimetable.get(0).addMinutes(1, "31A");
         expectedTimetable.get(0).addMinutes(2, "31A");
         expectedTimetable.get(0).addMinutes(3, "31A");
 
+        expectedTimetable.get(1).setDescription("Fr/Sa-Sa/Su");
         expectedTimetable.get(1).addMinutes(23, "31A");
         expectedTimetable.get(1).addMinutes(0, "31");
         expectedTimetable.get(1).addMinutes(1, "31");
         expectedTimetable.get(1).addMinutes(2, "31A");
         expectedTimetable.get(1).addMinutes(3, "31A");
 
+        expectedTimetable.get(2).setDescription("Su/Mo");
         expectedTimetable.get(2).addMinutes(23, "31A");
         expectedTimetable.get(2).addMinutes(0, "31A");
         expectedTimetable.get(2).addMinutes(1, "31A");
@@ -192,18 +198,21 @@ public class CracowLineTest
         while (expectedTimetable.size() < 3)
             expectedTimetable.add(new Timetable());
 
+        expectedTimetable.get(0).setDescription("Mo/Tu - Th/Fr");
         expectedTimetable.get(0).addMinutes(23, "34A");
         expectedTimetable.get(0).addMinutes(0, "34A");
         expectedTimetable.get(0).addMinutes(1, "34A");
         expectedTimetable.get(0).addMinutes(2, "34A");
         expectedTimetable.get(0).addMinutes(3, "34A");
 
+        expectedTimetable.get(1).setDescription("Fr/Sa-Sa/Su");
         expectedTimetable.get(1).addMinutes(23, "34A");
         expectedTimetable.get(1).addMinutes(0, "34");
         expectedTimetable.get(1).addMinutes(1, "34");
         expectedTimetable.get(1).addMinutes(2, "34A");
         expectedTimetable.get(1).addMinutes(3, "34A");
 
+        expectedTimetable.get(2).setDescription("Su/Mo");
         expectedTimetable.get(2).addMinutes(23, "34A");
         expectedTimetable.get(2).addMinutes(0, "34A");
         expectedTimetable.get(2).addMinutes(1, "34A");
@@ -225,6 +234,7 @@ public class CracowLineTest
 
         expectedTimetable.add(new Timetable());
 
+        expectedTimetable.get(0).setDescription("All days of the week");
         expectedTimetable.get(0).addMinutes(23, "22");
         expectedTimetable.get(0).addMinutes(0, "22");
         expectedTimetable.get(0).addMinutes(1, "22");
@@ -247,6 +257,7 @@ public class CracowLineTest
         while (expectedTimetable.size() < 2)
             expectedTimetable.add(new Timetable());
 
+        expectedTimetable.get(0).setDescription("Weekday");
         expectedTimetable.get(0).addMinutes(6, "13");
         expectedTimetable.get(0).addMinutes(8, "12");
         expectedTimetable.get(0).addMinutes(10, "18");
@@ -254,6 +265,7 @@ public class CracowLineTest
         expectedTimetable.get(0).addMinutes(15, "25");
         expectedTimetable.get(0).addMinutes(17, "01");
 
+        expectedTimetable.get(1).setDescription("Saturdays");
         expectedTimetable.get(1).addMinutes(6, "16");
         expectedTimetable.get(1).addMinutes(8, "07");
         expectedTimetable.get(1).addMinutes(10, "20");
