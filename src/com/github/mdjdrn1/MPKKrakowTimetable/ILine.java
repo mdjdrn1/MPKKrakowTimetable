@@ -9,9 +9,9 @@ import java.util.List;
 
 public interface ILine
 {
-    List<Integer> getLineNumbersList();
+    int getLineNumber();
+    List<Integer> getLineNumbersList() throws Exception;
     List<Direction> getDirectionsList() throws Exception;
     List<Stop> getStopsList(Direction direction) throws Exception;
     ArrayList<Timetable> getTimetables(Direction direction, Stop stop) throws Exception;
-    int getLineNumber();
 }

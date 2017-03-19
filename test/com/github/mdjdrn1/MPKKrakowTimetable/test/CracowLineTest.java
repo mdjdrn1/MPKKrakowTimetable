@@ -1,7 +1,6 @@
 package com.github.mdjdrn1.MPKKrakowTimetable.test;
 
-import com.github.mdjdrn1.MPKKrakowTimetable.CracowLine;
-import com.github.mdjdrn1.MPKKrakowTimetable.CracowURLCreator;
+import com.github.mdjdrn1.MPKKrakowTimetable.*;
 import com.github.mdjdrn1.MPKKrakowTimetable.structures.Direction;
 import com.github.mdjdrn1.MPKKrakowTimetable.structures.Stop;
 import com.github.mdjdrn1.MPKKrakowTimetable.structures.Timetable;
@@ -27,14 +26,16 @@ public class CracowLineTest
     @Test
     void linesNumbersListShouldHave5thItemEqual5() throws Exception
     {
-        List<Integer> lines = CracowLine.setLineNumbersList();
+        CracowLine line = new CracowLine(1);
+        List<Integer> lines = line.getLineNumbersList();
         assertThat(lines.get(4)).isEqualTo(5);
     }
 
     @Test
     void linesNumbersListShouldContain18() throws Exception
     {
-        List<Integer> lines = CracowLine.setLineNumbersList();
+        CracowLine line = new CracowLine(1);
+        List<Integer> lines = line.getLineNumbersList();
         assertThat(lines.contains(18));
     }
 
@@ -110,11 +111,11 @@ public class CracowLineTest
     @Test
     void timetableDayLine213() throws Exception
     {
-        // TODO: run test only if timetable didn't change (assume?)
+        // TODO: should I run test only if timetable didn't change? (use assume?)
 
         ArrayList<Timetable> expectedTimetable = new ArrayList<>(3);
 
-        while(expectedTimetable.size() < 3)
+        while (expectedTimetable.size() < 3)
             expectedTimetable.add(new Timetable());
 
         expectedTimetable.get(0).addMinutes(4, Arrays.asList("00", "50"));
@@ -154,7 +155,7 @@ public class CracowLineTest
     {
         ArrayList<Timetable> expectedTimetable = new ArrayList<>(3);
 
-        while(expectedTimetable.size() < 3)
+        while (expectedTimetable.size() < 3)
             expectedTimetable.add(new Timetable());
 
         expectedTimetable.get(0).addMinutes(23, "31A");
@@ -188,7 +189,7 @@ public class CracowLineTest
     {
         ArrayList<Timetable> expectedTimetable = new ArrayList<>(3);
 
-        while(expectedTimetable.size() < 3)
+        while (expectedTimetable.size() < 3)
             expectedTimetable.add(new Timetable());
 
         expectedTimetable.get(0).addMinutes(23, "34A");
@@ -233,6 +234,36 @@ public class CracowLineTest
         CracowLine line = new CracowLine(608);
         Direction direction = line.getDirectionsList().get(1);
         Stop stop = line.getStopsList(direction).get(3);
+        ArrayList<Timetable> actualTimetable = line.getTimetables(direction, stop);
+
+        assertThat(actualTimetable).isEqualTo(expectedTimetable);
+    }
+
+    @Test
+    void lineWith2Timetables() throws Exception
+    {
+        ArrayList<Timetable> expectedTimetable = new ArrayList<>(2);
+
+        while (expectedTimetable.size() < 2)
+            expectedTimetable.add(new Timetable());
+
+        expectedTimetable.get(0).addMinutes(6, "13");
+        expectedTimetable.get(0).addMinutes(8, "12");
+        expectedTimetable.get(0).addMinutes(10, "18");
+        expectedTimetable.get(0).addMinutes(12, "21");
+        expectedTimetable.get(0).addMinutes(15, "25");
+        expectedTimetable.get(0).addMinutes(17, "01");
+
+        expectedTimetable.get(1).addMinutes(6, "16");
+        expectedTimetable.get(1).addMinutes(8, "07");
+        expectedTimetable.get(1).addMinutes(10, "20");
+        expectedTimetable.get(1).addMinutes(12, "23");
+        expectedTimetable.get(1).addMinutes(15, "04");
+        expectedTimetable.get(1).addMinutes(16, "58");
+
+        CracowLine line = new CracowLine(285);
+        Direction direction = line.getDirectionsList().get(0);
+        Stop stop = line.getStopsList(direction).get(6);
         ArrayList<Timetable> actualTimetable = line.getTimetables(direction, stop);
 
         assertThat(actualTimetable).isEqualTo(expectedTimetable);

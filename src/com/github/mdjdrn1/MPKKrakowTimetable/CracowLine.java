@@ -1,34 +1,23 @@
 package com.github.mdjdrn1.MPKKrakowTimetable;
 
-import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
 import com.github.mdjdrn1.MPKKrakowTimetable.structures.Direction;
 import com.github.mdjdrn1.MPKKrakowTimetable.structures.Stop;
 import com.github.mdjdrn1.MPKKrakowTimetable.structures.Timetable;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-public class CracowLine implements ILine
+
+public class CracowLine extends XPathParser implements ILine
 {
-    private static List<Integer> lineNumbersList;
+    private final int lineNumber;
 
-    static
-    {
-        try
-        {
-            lineNumbersList = setLineNumbersList();
-        }
-        catch (Exception e)
-        {
-            System.out.println("Failed initializing static CracowLine members.");
-        }
-    }
 
     private static CracowURLCreator urlCreator = new CracowURLCreator();
-    private final Integer lineNumber;
 
-    public static List<Integer> setLineNumbersList() throws Exception
+    public List<Integer> getLineNumbersList() throws Exception
     {
         List<Integer> lineNumbers = new ArrayList<>();
 
@@ -56,17 +45,18 @@ public class CracowLine implements ILine
         return lineNumbers;
     }
 
-    public List<Integer> getLineNumbersList()
-    {
-        return lineNumbersList;
-    }
-
     public CracowLine(int lineNumber) throws Exception
     {
-        if (!lineNumbersList.contains(lineNumber))
+        if (!getLineNumbersList().contains(lineNumber))
             throw new Exception("Line " + lineNumber + " doesn't exist.");
 
         this.lineNumber = lineNumber;
+    }
+
+    @Override
+    public int getLineNumber()
+    {
+        return lineNumber;
     }
 
     public boolean isNightLine()
@@ -76,12 +66,6 @@ public class CracowLine implements ILine
         boolean isBusAgglomerationNightLine = lineNumber >= 900 || lineNumber < 1000;
 
         return isTramNightLine || isBusUrbanNightLine || isBusAgglomerationNightLine;
-    }
-
-    @Override
-    public int getLineNumber()
-    {
-        return lineNumber;
     }
 
     @Override
@@ -169,14 +153,19 @@ public class CracowLine implements ILine
             throw new Exception("getStopsList() exception. Cannot parse stops.");
         }
 
+        int rere = 1;
         for (HtmlElement htmlItem : items)
         {
             List<HtmlTableCell> tableCells = (List<HtmlTableCell>) htmlItem.getByXPath("../tr/td");
-            for (int i = 5; i + amountOfTimetables < tableCells.size(); i += amountOfTimetables + 1)
+
+            int indexOfFirstHour = 0;
+            while (getTableCellValue(tableCells.get(indexOfFirstHour)) == null)
+                ++indexOfFirstHour;
+
+            for (int i = indexOfFirstHour; i + amountOfTimetables < tableCells.size(); i += amountOfTimetables + 1)
             {
                 HtmlTableCell item = tableCells.get(i);
                 Integer hour = getTableCellValue(item);
-
                 if (hour == null)
                     break;
 
@@ -200,18 +189,6 @@ public class CracowLine implements ILine
         return amountOfTimetables;
     }
 
-    private static Integer getTableCellValue(HtmlTableCell item)
-    {
-        try
-        {
-            return Integer.valueOf(item.asText().trim());
-        }
-        catch (Exception e)
-        {
-            return null;
-        }
-    }
-
     private static ArrayList<String> getAllTableCellValues(HtmlTableCell item)
     {
         String itemAsText = item.asText().trim();
@@ -222,24 +199,5 @@ public class CracowLine implements ILine
         ArrayList<String> values = new ArrayList<>(Arrays.asList(stringValues));
 
         return !values.isEmpty() ? values : null;
-    }
-
-    public static HtmlPage getHtmlPage(String url) throws Exception
-    {
-        WebClient client = new WebClient();
-        client.getOptions().setCssEnabled(false);
-        client.getOptions().setJavaScriptEnabled(false);
-
-        HtmlPage page = null;
-        try
-        {
-            page = client.getPage(url);
-        }
-        catch (IOException e)
-        {
-            throw new Exception("Cannot parse page from url: \"" + url + "\".");
-        }
-
-        return page;
     }
 }
