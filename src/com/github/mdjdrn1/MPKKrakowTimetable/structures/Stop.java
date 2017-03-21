@@ -5,7 +5,6 @@ public class Stop
     private final String name;
     private final Integer id;
     private final boolean onDemand;
-    // TODO: add delay
 
     public Stop(String name, Integer id)
     {
@@ -41,7 +40,7 @@ public class Stop
                 "name='" + name + '\'' +
                 ", id=" + id;
 
-        if(onDemand)
+        if (onDemand)
             string += ", onDemand";
 
         string += '}';

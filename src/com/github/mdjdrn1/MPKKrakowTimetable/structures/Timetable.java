@@ -77,10 +77,36 @@ public class Timetable
     @Override
     public String toString()
     {
-        return "Timetable{" +
-                "description='" + description + '\'' +
-                ", timetableList=" + timetableList +
-                '}';
+        String string = "";
+        string += "{" +
+                "description='" + description + '\''
+                + ", departures=[";
+
+        boolean first = true;
+        for(int hour = 0; hour < timetableList.size(); ++hour)
+        {
+            List<String> minutes = timetableList.get(hour);
+            if(!minutes.isEmpty())
+            {
+                if(!first)
+                    string += ", ";
+                else
+                    first = false;
+
+                string += hour + ":(";
+                for(int k = 0; k < minutes.size(); ++k)
+                {
+                    string += minutes.get(k);
+                    if(k != minutes.size() - 1)
+                        string += ", ";
+                }
+                string += ")";
+            }
+        }
+
+        string += "]}";
+
+        return string;
     }
 
     @Override

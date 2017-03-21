@@ -5,6 +5,8 @@ import com.github.mdjdrn1.MPKKrakowTimetable.structures.Direction;
 import com.github.mdjdrn1.MPKKrakowTimetable.structures.Stop;
 import com.github.mdjdrn1.MPKKrakowTimetable.structures.Timetable;
 
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -148,7 +150,7 @@ public class CracowLine extends XPathParser implements ILine
      * of List<String> (representing departure minutes)
      */
     @Override
-    public ArrayList<Timetable> getTimetables(Direction direction, Stop stop) throws Exception
+    public List<Timetable> getTimetables(Direction direction, Stop stop) throws Exception
     {
         HtmlPage page = getHtmlPage(urlCreator.getLineUrl(lineNumber, direction, stop));
 
@@ -241,5 +243,57 @@ public class CracowLine extends XPathParser implements ILine
         }
 
         return descriptions;
+    }
+
+    public List<Integer> getDelayList(Direction direction) throws Exception
+    {
+        List<Integer> delays = new ArrayList<>();
+
+        List<Stop> stops = this.getStopsList(direction);
+        Stop firstStop = stops.get(0);
+
+        for (int i = 1; i < stops.size(); ++i)
+        {
+            Stop stop = stops.get(i);
+            delays.add(getDelayBetweenStops(direction, firstStop, stop));
+        }
+
+        return delays;
+    }
+
+    public Integer getDelayBetweenStops(Direction direction, Stop stop1, Stop stop2) throws Exception
+    {
+        Timetable timetable1 = this.getTimetables(direction, stop1).get(0);
+        LocalTime departure1 = findFirstDepartureInTimetable(timetable1);
+
+        Timetable timetable2 = this.getTimetables(direction, stop2).get(0);
+        LocalTime departure2 = findFirstDepartureInTimetable(timetable2);
+
+        Integer minutesBetween = (int) ChronoUnit.MINUTES.between(departure1, departure2);
+
+        Integer delay = minutesBetween >= 0 ? minutesBetween : minutesBetween + 60*24;
+
+        return delay;
+    }
+
+    private LocalTime findFirstDepartureInTimetable(Timetable timetable)
+    {
+        LocalTime firstDeparture = null;
+        for (int hour = 0; hour < 24; ++hour)
+        {
+            List<String> minutes = timetable.getMinutes(hour);
+            if(!minutes.isEmpty())
+            {
+                int minute = parseMinuteStringToInt(minutes.get(0));
+                firstDeparture = LocalTime.of(hour, minute);
+            }
+        }
+        return firstDeparture;
+    }
+
+    private Integer parseMinuteStringToInt(String minuteString)
+    {
+        String str = minuteString.substring(0, 2);
+        return Integer.parseInt(str);
     }
 }

@@ -148,7 +148,7 @@ public class CracowLineTest
         CracowLine line = new CracowLine(213);
         Direction direction = line.getDirectionsList().get(0);
         Stop stop = line.getStopsList(direction).get(0);
-        ArrayList<Timetable> actualTimetable = line.getTimetables(direction, stop);
+        List<Timetable> actualTimetable = line.getTimetables(direction, stop);
 
         assertThat(actualTimetable).isEqualTo(expectedTimetable);
     }
@@ -185,7 +185,7 @@ public class CracowLineTest
         CracowLine line = new CracowLine(605);
         Direction direction = line.getDirectionsList().get(0);
         Stop stop = line.getStopsList(direction).get(0);
-        ArrayList<Timetable> actualTimetable = line.getTimetables(direction, stop);
+        List<Timetable> actualTimetable = line.getTimetables(direction, stop);
 
         assertThat(actualTimetable).isEqualTo(expectedTimetable);
     }
@@ -222,7 +222,7 @@ public class CracowLineTest
         CracowLine line = new CracowLine(605);
         Direction direction = line.getDirectionsList().get(0);
         Stop stop = line.getStopsList(direction).get(2);
-        ArrayList<Timetable> actualTimetable = line.getTimetables(direction, stop);
+        List<Timetable> actualTimetable = line.getTimetables(direction, stop);
 
         assertThat(actualTimetable).isEqualTo(expectedTimetable);
     }
@@ -244,7 +244,7 @@ public class CracowLineTest
         CracowLine line = new CracowLine(608);
         Direction direction = line.getDirectionsList().get(1);
         Stop stop = line.getStopsList(direction).get(3);
-        ArrayList<Timetable> actualTimetable = line.getTimetables(direction, stop);
+        List<Timetable> actualTimetable = line.getTimetables(direction, stop);
 
         assertThat(actualTimetable).isEqualTo(expectedTimetable);
     }
@@ -276,8 +276,20 @@ public class CracowLineTest
         CracowLine line = new CracowLine(285);
         Direction direction = line.getDirectionsList().get(0);
         Stop stop = line.getStopsList(direction).get(6);
-        ArrayList<Timetable> actualTimetable = line.getTimetables(direction, stop);
+        List<Timetable> actualTimetable = line.getTimetables(direction, stop);
 
         assertThat(actualTimetable).isEqualTo(expectedTimetable);
+    }
+
+    @Test
+    void stopDelayListFor100() throws Exception
+    {
+        CracowLine line = new CracowLine(100);
+        Direction direction = line.getDirectionsList().get(0);
+
+        List<Integer> expectedDelayList = new ArrayList<>(Arrays.asList(2, 4));
+        List<Integer> actualDelayList = line.getDelayList(direction);
+
+        assertThat(expectedDelayList).isEqualTo(actualDelayList);
     }
 }
