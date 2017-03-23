@@ -62,9 +62,9 @@ public class CracowLine extends XPathParser implements ILine
 
     public boolean isNightLine()
     {
-        boolean isTramNightLine = lineNumber >= 60 || lineNumber < 70;
-        boolean isBusUrbanNightLine = lineNumber >= 600 || lineNumber < 700;
-        boolean isBusAgglomerationNightLine = lineNumber >= 900 || lineNumber < 1000;
+        boolean isTramNightLine = lineNumber >= 60 && lineNumber < 70;
+        boolean isBusUrbanNightLine = lineNumber >= 600 && lineNumber < 700;
+        boolean isBusAgglomerationNightLine = lineNumber >= 900 && lineNumber < 1000;
 
         return isTramNightLine || isBusUrbanNightLine || isBusAgglomerationNightLine;
     }
@@ -251,41 +251,41 @@ public class CracowLine extends XPathParser implements ILine
 
         List<Stop> stops = this.getStopsList(direction);
         Stop firstStop = stops.get(0);
+        LocalTime firstStopFirstDeparture = getFirstDeparture(direction, firstStop);
 
         for (int i = 1; i < stops.size(); ++i)
         {
             Stop stop = stops.get(i);
-            delays.add(getDelayBetweenStops(direction, firstStop, stop));
+            LocalTime stopFirstDeparture = getFirstDeparture(direction, stop);
+            delays.add(getMinutesBetween(firstStopFirstDeparture, stopFirstDeparture));
         }
 
         return delays;
     }
 
-    public Integer getDelayBetweenStops(Direction direction, Stop stop1, Stop stop2) throws Exception
+    public Integer getMinutesBetween(LocalTime time1, LocalTime time2) throws Exception
     {
-        Timetable timetable1 = this.getTimetables(direction, stop1).get(0);
-        LocalTime departure1 = findFirstDepartureInTimetable(timetable1);
+        Integer minutesBetween = (int) ChronoUnit.MINUTES.between(time1, time2);
 
-        Timetable timetable2 = this.getTimetables(direction, stop2).get(0);
-        LocalTime departure2 = findFirstDepartureInTimetable(timetable2);
-
-        Integer minutesBetween = (int) ChronoUnit.MINUTES.between(departure1, departure2);
-
-        Integer delay = minutesBetween >= 0 ? minutesBetween : minutesBetween + 60*24;
-
-        return delay;
+        return minutesBetween >= 0 ? minutesBetween : minutesBetween + 60 * 24;
     }
 
-    private LocalTime findFirstDepartureInTimetable(Timetable timetable)
+    private LocalTime getFirstDeparture(Direction direction, Stop stop) throws Exception
     {
+        Timetable timetable = this.getTimetables(direction, stop).get(0);
+
         LocalTime firstDeparture = null;
-        for (int hour = 0; hour < 24; ++hour)
+        int firstHourToCheck = !isNightLine() ? 3 : 22;
+        int lastHourToCheck = !isNightLine() ? 2 : 5;
+
+        for (int hour = firstHourToCheck; hour != lastHourToCheck; hour = (hour + 1) % 24)
         {
             List<String> minutes = timetable.getMinutes(hour);
-            if(!minutes.isEmpty())
+            if (!minutes.isEmpty())
             {
                 int minute = parseMinuteStringToInt(minutes.get(0));
                 firstDeparture = LocalTime.of(hour, minute);
+                break;
             }
         }
         return firstDeparture;

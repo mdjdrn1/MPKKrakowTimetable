@@ -50,6 +50,6 @@ public class SStop
     @Override
     public String toString()
     {
-        return "Line [id = " + id + ", name = " + name + ", delay = " + delay + "]";
+        return "Line [id = " + id + ", name = " + name + ", onDemand = " + onDemand +", delay = " + delay + "]";
     }
 }
