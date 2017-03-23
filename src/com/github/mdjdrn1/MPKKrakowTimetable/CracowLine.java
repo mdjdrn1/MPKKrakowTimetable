@@ -253,6 +253,8 @@ public class CracowLine extends XPathParser implements ILine
         Stop firstStop = stops.get(0);
         LocalTime firstStopFirstDeparture = getFirstDeparture(direction, firstStop);
 
+        delays.add(0);  // first stop delay
+
         for (int i = 1; i < stops.size(); ++i)
         {
             Stop stop = stops.get(i);
