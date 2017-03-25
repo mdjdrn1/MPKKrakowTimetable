@@ -49,3 +49,4 @@ fabric.properties
 *.iml
 target/*
 example*
+/output/*

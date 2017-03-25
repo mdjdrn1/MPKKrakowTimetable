@@ -10,10 +10,15 @@ public class JsonSerializer implements ILineSerializer
 {
     public String serializeLine(ILine line) throws Exception
     {
+        return serializeLine(line, false);
+    }
+
+    public String serializeLine(ILine line, boolean prettyPrint) throws Exception
+    {
         SerializableLineBuilder builder = new SerializableLineBuilder(line);
         SerializableLine sLine = builder.getSerializableLine();
 
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = prettyPrint ? new GsonBuilder().setPrettyPrinting().create() : new GsonBuilder().create();
         return gson.toJson(sLine);
     }
 }
