@@ -168,7 +168,7 @@ public class CracowLine implements ILine
         for (int i = indexOfFirstHour; i + amountOfTimetables < cells.size(); i += amountOfTimetables + 1)
         {
             HtmlTableCell item = cells.get(i);
-            Integer hour = XPathParser.getTableCellValue(item);
+            Integer hour = getTableCellValue(item);
             if (hour == null)
                 break;
 
@@ -203,10 +203,22 @@ public class CracowLine implements ILine
     private int findIndexOfFirstHour(List<HtmlTableCell> tableCells)
     {
         int indexOfFirstHour = 0;
-        while (XPathParser.getTableCellValue(tableCells.get(indexOfFirstHour)) == null)
+        while (getTableCellValue(tableCells.get(indexOfFirstHour)) == null)
             ++indexOfFirstHour;
 
         return indexOfFirstHour;
+    }
+
+    public Integer getTableCellValue(HtmlTableCell item)
+    {
+        try
+        {
+            return Integer.valueOf(item.asText().trim());
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
     }
 
     private ArrayList<String> getAllTableCellValues(HtmlTableCell item)

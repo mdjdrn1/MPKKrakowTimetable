@@ -6,5 +6,5 @@ import com.github.mdjdrn1.MPKKrakowTimetable.lines.SLine;
 
 public interface ILineSerializer
 {
-    public String serializeLine(SLine line) throws ParsingException, ConnectionError;
+    String serializeLine(SLine line) throws ParsingException, ConnectionError;
 }

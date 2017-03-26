@@ -2,7 +2,6 @@ package com.github.mdjdrn1.MPKKrakowTimetable.lines;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.HtmlTableCell;
 
 import java.io.IOException;
 
@@ -25,17 +24,5 @@ class XPathParser
         }
 
         return page;
-    }
-
-    public static Integer getTableCellValue(HtmlTableCell item)
-    {
-        try
-        {
-            return Integer.valueOf(item.asText().trim());
-        }
-        catch (Exception e)
-        {
-            return null;
-        }
     }
 }

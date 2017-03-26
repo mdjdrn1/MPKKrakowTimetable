@@ -23,10 +23,9 @@ public class AllLinesSerializer
 
     public static void main(String[] args)
     {
-        CracowLine randomLine = null;
         try
         {
-            randomLine = new CracowLine(1);
+            CracowLine randomLine = new CracowLine(1);
             serializeAllLines(randomLine);
         }
         catch (ParsingException | ConnectionError e)
