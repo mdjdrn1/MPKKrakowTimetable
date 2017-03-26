@@ -2,7 +2,7 @@ package com.github.mdjdrn1.MPKKrakowTimetable.lines;
 
 import java.util.List;
 
-class STimetable
+public class STimetable
 {
     private String description;
 

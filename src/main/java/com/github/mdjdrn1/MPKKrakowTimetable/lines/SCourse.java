@@ -2,7 +2,7 @@ package com.github.mdjdrn1.MPKKrakowTimetable.lines;
 
 import java.util.List;
 
-class SCourse
+public class SCourse
 {
     private String direction;
     private List<STimetable> timetable;

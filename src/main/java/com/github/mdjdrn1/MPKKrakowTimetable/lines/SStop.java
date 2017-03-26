@@ -1,6 +1,6 @@
 package com.github.mdjdrn1.MPKKrakowTimetable.lines;
 
-class SStop
+public class SStop
 {
     private int id;
     private String name;

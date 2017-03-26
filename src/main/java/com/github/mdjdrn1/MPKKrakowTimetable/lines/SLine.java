@@ -2,7 +2,7 @@ package com.github.mdjdrn1.MPKKrakowTimetable.lines;
 
 import java.util.List;
 
-class SLine
+public class SLine
 {
     private int number;
     private List<SCourse> course;

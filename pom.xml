@@ -5,9 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>TimetableGroup</groupId>
-    <artifactId>MPKKrakowTimetable</artifactId>
+    <artifactId>quickstart</artifactId>
     <version>1.0-SNAPSHOT</version>
-
     <build>
         <plugins>
             <plugin>
@@ -20,6 +19,7 @@
         </plugins>
     </build>
     <dependencies>
+        <!-- Testing -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -36,21 +36,30 @@
             <artifactId>assertj-core</artifactId>
             <version>3.6.2</version>
         </dependency>
+        <!-- XPath parser -->
         <dependency>
             <groupId>net.sourceforge.htmlunit</groupId>
             <artifactId>htmlunit</artifactId>
             <version>2.24</version>
         </dependency>
+        <!-- Logger -->
+        <dependency>
+            <groupId>org.tinylog</groupId>
+            <artifactId>tinylog</artifactId>
+            <version>1.2</version>
+        </dependency>
+        <!-- JSON serializing -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.8.0</version>
             <scope>compile</scope>
         </dependency>
+        <!-- XML serializing -->
         <dependency>
-            <groupId>org.tinylog</groupId>
-            <artifactId>tinylog</artifactId>
-            <version>1.2</version>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.9</version>
         </dependency>
     </dependencies>
 </project>

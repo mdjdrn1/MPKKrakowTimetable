@@ -6,17 +6,15 @@ import com.google.gson.GsonBuilder;
 
 public class JsonSerializer implements ILineSerializer
 {
-    public String serializeLine(ILine line) throws ParsingException, ConnectionError
+    @Override
+    public String serializeLine(SLine line) throws ParsingException, ConnectionError
     {
         return serializeLine(line, false);
     }
 
-    public String serializeLine(ILine line, boolean prettyPrint) throws ParsingException, ConnectionError
+    public String serializeLine(SLine line, boolean prettyPrint) throws ParsingException, ConnectionError
     {
-        SerializableLineBuilder builder = new SerializableLineBuilder(line);
-        SerializableLine sLine = builder.getSerializableLine();
-
         Gson gson = prettyPrint ? new GsonBuilder().setPrettyPrinting().create() : new GsonBuilder().create();
-        return gson.toJson(sLine);
+        return gson.toJson(line);
     }
 }

@@ -3,29 +3,31 @@ package com.github.mdjdrn1.MPKKrakowTimetable.lines;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SerializableLineBuilder
+public class SLineBuilder implements ISLineBuilder
 {
-    private SerializableLine sLine;
+    private ILine iLine;
 
-    public SerializableLineBuilder(ILine line) throws ParsingException, ConnectionError
+    public SLineBuilder(ILine line)
     {
-        int lineNumber = line.getLineNumber();
-
-        sLine = new SerializableLine();
-        sLine.setLine(new SLine());
-        sLine.getLine().setNumber(lineNumber);
-        sLine.getLine().setCourse(setupCourses(line));
+        iLine = line;
     }
 
-    private List<SCourse> setupCourses(ILine line) throws ParsingException, ConnectionError
+    @Override
+    public int buildLineNumber()
+    {
+        return iLine.getLineNumber();
+    }
+
+    @Override
+    public List<SCourse> buildCourses() throws ParsingException, ConnectionError
     {
 
         List<SCourse> courses = new ArrayList<>();
 
-        List<Direction> directions = line.getDirectionsList();
+        List<Direction> directions = iLine.getDirectionsList();
         for (Direction direction : directions)
         {
-            List<Stop> stopsList = line.getStopsList(direction);
+            List<Stop> stopsList = iLine.getStopsList(direction);
 
             SCourse course = new SCourse();
 
@@ -33,10 +35,10 @@ public class SerializableLineBuilder
             course.setDirection(direction.getName());
 
             // setting up first stop timetable
-            course.setTimetable(setupFirstStopTimetable(line, direction, stopsList));
+            course.setTimetable(buildFirstStopTimetable(direction, stopsList));
 
             // setting up stops list
-            course.setStop(setupStopsList(line, direction, stopsList));
+            course.setStop(buildStopsList(direction, stopsList));
 
             courses.add(course);
         }
@@ -44,9 +46,9 @@ public class SerializableLineBuilder
         return courses;
     }
 
-    private List<STimetable> setupFirstStopTimetable(ILine line, Direction direction, List<Stop> stopsList) throws ParsingException, ConnectionError
+    private List<STimetable> buildFirstStopTimetable(Direction direction, List<Stop> stopsList) throws ParsingException, ConnectionError
     {
-        List<Timetable> firstStopTimetable = line.getTimetables(direction, stopsList.get(0));
+        List<Timetable> firstStopTimetable = iLine.getTimetables(direction, stopsList.get(0));
 
         List<STimetable> newFirstStopTimetable = new ArrayList<>();
         for(Timetable timetable : firstStopTimetable)
@@ -62,9 +64,9 @@ public class SerializableLineBuilder
         return newFirstStopTimetable;
     }
 
-    private List<SStop> setupStopsList(ILine line, Direction direction, List<Stop> stopsList) throws ParsingException, ConnectionError
+    private List<SStop> buildStopsList(Direction direction, List<Stop> stopsList) throws ParsingException, ConnectionError
     {
-        List<Integer> delayList = line.getDelayList(direction);
+        List<Integer> delayList = iLine.getDelayList(direction);
 
         List<SStop> newStopsList = new ArrayList<>();
         for (int i = 0; i < stopsList.size(); ++i)
@@ -79,10 +81,5 @@ public class SerializableLineBuilder
         }
 
         return newStopsList;
-    }
-
-    public SerializableLine getSerializableLine()
-    {
-        return sLine;
     }
 }

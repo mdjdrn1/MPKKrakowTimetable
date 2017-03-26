@@ -1,8 +1,6 @@
 package com.github.mdjdrn1.MPKKrakowTimetable.serializer;
 
-import com.github.mdjdrn1.MPKKrakowTimetable.lines.ConnectionError;
-import com.github.mdjdrn1.MPKKrakowTimetable.lines.CracowLine;
-import com.github.mdjdrn1.MPKKrakowTimetable.lines.ParsingException;
+import com.github.mdjdrn1.MPKKrakowTimetable.lines.*;
 import org.pmw.tinylog.Configurator;
 import org.pmw.tinylog.Logger;
 import org.pmw.tinylog.writers.FileWriter;
@@ -50,7 +48,11 @@ public class AllLinesSerializer
                 Logger.info("Parsing line " + lineNumber + ".");
                 try
                 {
-                    saveJsonStringToFile(lineNumber, serializer.serializeLine(new CracowLine(lineNumber)));
+                    saveJsonStringToFile(lineNumber, serializer.serializeLine(
+                            SLineDirector.makeLine(
+                                    new SLineBuilder(
+                                            new CracowLine(lineNumber)))
+                    ));
                 }
                 catch (ParsingException | ConnectionError e)
                 {
@@ -58,7 +60,7 @@ public class AllLinesSerializer
                 }
             });
         }
-        catch(ParsingException | ConnectionError e)
+        catch (ParsingException | ConnectionError e)
         {
             Logger.error(e.getMessage());
         }
