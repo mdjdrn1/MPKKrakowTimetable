@@ -2,6 +2,7 @@ package com.github.mdjdrn1.MPKKrakowTimetable.lines;
 
 import com.gargoylesoftware.htmlunit.html.*;
 
+import java.security.InvalidParameterException;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -9,22 +10,21 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class CracowLine extends XPathParser implements ILine
+public class CracowLine implements ILine
 {
     private final int lineNumber;
-
     private static CracowURLCreator urlCreator = new CracowURLCreator();
-
-    public List<Integer> getLineNumbersList() throws Exception
+    
+    public List<Integer> getLineNumbersList() throws ParsingException, ConnectionError
     {
         List<Integer> lineNumbers = new ArrayList<>();
 
-        HtmlPage page = getHtmlPage(CracowURLCreator.getHomePage());
+        HtmlPage page = XPathParser.getHtmlPage(CracowURLCreator.getHomePage());
 
         List<HtmlTableCell> items = (List<HtmlTableCell>) page.getByXPath("//td[@class='linia_table_left']");
 
         if (items == null)
-            throw new Exception("getLineNumbersList() exception. Cannot parse line numbers.");
+            throw new ParsingException("Cannot parse line numbers. Method: getLineNumbersList().");
         else
         {
             for (HtmlElement htmlItem : items)
@@ -33,7 +33,7 @@ public class CracowLine extends XPathParser implements ILine
                 for (HtmlAnchor item : itemAnchor)
                 {
                     if (item == null)
-                        throw new Exception("getLineNumbersList() exception. Cannot parse line numbers");
+                        throw new ParsingException("Cannot parse line numbers. Method: getLineNumbersList().");
                     else
                         lineNumbers.add(Integer.valueOf(item.asText()));
                 }
@@ -43,10 +43,10 @@ public class CracowLine extends XPathParser implements ILine
         return lineNumbers;
     }
 
-    public CracowLine(int lineNumber) throws Exception
+    public CracowLine(int lineNumber) throws InvalidParameterException, ParsingException, ConnectionError
     {
         if (!getLineNumbersList().contains(lineNumber))
-            throw new Exception("Line " + lineNumber + " doesn't exist.");
+            throw new InvalidParameterException("Line " + lineNumber + " doesn't exist.");
 
         this.lineNumber = lineNumber;
     }
@@ -67,22 +67,20 @@ public class CracowLine extends XPathParser implements ILine
     }
 
     @Override
-    public List<Direction> getDirectionsList() throws Exception
+    public List<Direction> getDirectionsList() throws ConnectionError, ParsingException
     {
         List<Direction> directions = new ArrayList<>();
 
-        HtmlPage page = getHtmlPage(urlCreator.getLineUrl(lineNumber));
+        HtmlPage page = XPathParser.getHtmlPage(urlCreator.getLineUrl(lineNumber));
 
         HtmlParagraph paragraph = page.getFirstByXPath("//p[contains(@style,'font-size: 40px;')]");
         if (paragraph == null)
-            throw new Exception("getDirectionsList() exception. Cannot parse directions.");
+            throw new ParsingException("Cannot parse directions. Method: getDirectionsList().");
 
         List<HtmlAnchor> itemAnchor = (List<HtmlAnchor>) paragraph.getByXPath("../../../td[@style='text-align: left; white-space: nowrap; ']/a");
 
         if (itemAnchor.size() == 0)
-        {
-            throw new Exception("getDirectionsList() exception. Cannot parse directions.");
-        }
+            throw new ParsingException("Cannot parse directions. Method: getDirectionsList().");
 
         int id = 1;
 
@@ -101,16 +99,16 @@ public class CracowLine extends XPathParser implements ILine
     }
 
     @Override
-    public List<Stop> getStopsList(Direction direction) throws Exception
+    public List<Stop> getStopsList(Direction direction) throws ConnectionError, ParsingException
     {
         List<Stop> stopsList = new ArrayList<>();
 
-        HtmlPage page = getHtmlPage(urlCreator.getLineUrl(lineNumber, direction));
+        HtmlPage page = XPathParser.getHtmlPage(urlCreator.getLineUrl(lineNumber, direction));
 
         List<HtmlAnchor> htmlAnchors = (List<HtmlAnchor>) page.getByXPath("//td[@style=' text-align: right; ']/a");
 
         if (htmlAnchors == null)
-            throw new Exception("getStopsList() exception. Cannot parse stops.");
+            throw new ParsingException("Cannot parse stops list. Method: getStopsList().");
 
         for (HtmlAnchor item : htmlAnchors)
         {
@@ -147,9 +145,9 @@ public class CracowLine extends XPathParser implements ILine
      * of List<String> (representing departure minutes)
      */
     @Override
-    public List<Timetable> getTimetables(Direction direction, Stop stop) throws Exception
+    public List<Timetable> getTimetables(Direction direction, Stop stop) throws ConnectionError, ParsingException
     {
-        HtmlPage page = getHtmlPage(urlCreator.getLineUrl(lineNumber, direction, stop));
+        HtmlPage page = XPathParser.getHtmlPage(urlCreator.getLineUrl(lineNumber, direction, stop));
 
         int amountOfTimetables = amountOfTimetablesOnPage(page);
         ArrayList<Timetable> timetableList = new ArrayList<>(amountOfTimetables);
@@ -163,16 +161,14 @@ public class CracowLine extends XPathParser implements ILine
         List<HtmlTableCell> cells = (List<HtmlTableCell>) row.getByXPath("../tr/td");
 
         if (cells.isEmpty())
-        {
-            throw new Exception("getStopsList() exception. Cannot parse timetable.");
-        }
+            throw new ParsingException("Cannot parse timetables. Method: getTimetables()");
 
         int indexOfFirstHour = findIndexOfFirstHour(cells);
 
         for (int i = indexOfFirstHour; i + amountOfTimetables < cells.size(); i += amountOfTimetables + 1)
         {
             HtmlTableCell item = cells.get(i);
-            Integer hour = getTableCellValue(item);
+            Integer hour = XPathParser.getTableCellValue(item);
             if (hour == null)
                 break;
 
@@ -186,7 +182,7 @@ public class CracowLine extends XPathParser implements ILine
 
         ArrayList<String> descriptions = getTimetablesDescriptions(indexOfFirstHour, amountOfTimetables, cells);
         if (descriptions.size() != amountOfTimetables)
-            throw new Exception("getStopsList() exception. Cannot parse descriptions for timetables.");
+            throw new ParsingException("Cannot parse descriptions for timetables. Method: getTimetables()");
 
         for (int i = 0; i < amountOfTimetables; ++i)
         {
@@ -207,7 +203,7 @@ public class CracowLine extends XPathParser implements ILine
     private int findIndexOfFirstHour(List<HtmlTableCell> tableCells)
     {
         int indexOfFirstHour = 0;
-        while (getTableCellValue(tableCells.get(indexOfFirstHour)) == null)
+        while (XPathParser.getTableCellValue(tableCells.get(indexOfFirstHour)) == null)
             ++indexOfFirstHour;
 
         return indexOfFirstHour;
@@ -242,7 +238,7 @@ public class CracowLine extends XPathParser implements ILine
         return descriptions;
     }
 
-    public List<Integer> getDelayList(Direction direction) throws Exception
+    public List<Integer> getDelayList(Direction direction) throws ConnectionError, ParsingException
     {
         List<Integer> delays = new ArrayList<>();
 
@@ -262,14 +258,14 @@ public class CracowLine extends XPathParser implements ILine
         return delays;
     }
 
-    private Integer getMinutesBetween(LocalTime time1, LocalTime time2) throws Exception
+    private Integer getMinutesBetween(LocalTime time1, LocalTime time2)
     {
         Integer minutesBetween = (int) ChronoUnit.MINUTES.between(time1, time2);
 
         return minutesBetween >= 0 ? minutesBetween : minutesBetween + 60 * 24;
     }
 
-    private LocalTime getFirstDeparture(Direction direction, Stop stop) throws Exception
+    private LocalTime getFirstDeparture(Direction direction, Stop stop) throws ConnectionError, ParsingException
     {
         Timetable timetable = this.getTimetables(direction, stop).get(0);
 

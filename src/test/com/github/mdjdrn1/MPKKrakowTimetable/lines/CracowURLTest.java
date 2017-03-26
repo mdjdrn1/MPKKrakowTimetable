@@ -7,14 +7,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CracowURLTest
 {
     @Test
-    void shouldReturnValidLine52URL() throws Exception
+    void shouldReturnValidLine52URL()
     {
         CracowURLCreator cracowURLCreator = new CracowURLCreator();
         assertThat(cracowURLCreator.getLineUrl(52)).matches(".*lang=(PL|EN|DE)&rozklad=\\d{8}&linia=52$");
     }
 
     @Test
-    void shouldReturnValidLine100Stop3URL() throws Exception
+    void shouldReturnValidLine100Stop3URL() throws ParsingException, ConnectionError
     {
         int lineNumber = 100;
         CracowLine line = new CracowLine(lineNumber);

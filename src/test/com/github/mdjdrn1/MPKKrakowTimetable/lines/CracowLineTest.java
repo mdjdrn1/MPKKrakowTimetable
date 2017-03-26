@@ -14,7 +14,7 @@ public class CracowLineTest
     public static class lineNumberTest
     {
         @Test
-        void shouldThrowExceptionForNonExistingLine() throws Exception
+        void shouldThrowExceptionForNonExistingLine()
         {
             assertThatThrownBy(() -> new CracowLine(0))
                     .isInstanceOf(Exception.class)
@@ -22,7 +22,7 @@ public class CracowLineTest
         }
 
         @Test
-        void linesNumbersListShouldHave5thItemEqual5() throws Exception
+        void linesNumbersListShouldHave5thItemEqual5() throws ParsingException, ConnectionError
         {
             CracowLine line = new CracowLine(1);
             List<Integer> lines = line.getLineNumbersList();
@@ -30,7 +30,7 @@ public class CracowLineTest
         }
 
         @Test
-        void linesNumbersListShouldContain18() throws Exception
+        void linesNumbersListShouldContain18() throws ParsingException, ConnectionError
         {
             CracowLine line = new CracowLine(1);
             List<Integer> lines = line.getLineNumbersList();
@@ -42,7 +42,7 @@ public class CracowLineTest
     public static class directionTest
     {
         @Test
-        void directionsListFor116() throws Exception
+        void directionsListFor116() throws ConnectionError, ParsingException
         {
             List<Direction> expectedDirections = new ArrayList<>(
                     Arrays.asList(
@@ -57,7 +57,7 @@ public class CracowLineTest
         }
 
         @Test
-        void directionsListLine451() throws Exception
+        void directionsListLine451() throws ConnectionError, ParsingException
         {
             List<Direction> expectedDirections = new ArrayList<>(
                     Arrays.asList(
@@ -74,7 +74,7 @@ public class CracowLineTest
     public static class stopTest
     {
         @Test
-        void stopsListLine116() throws Exception
+        void stopsListLine116() throws ConnectionError, ParsingException
         {
             List<Stop> expectedStops = new ArrayList<>(
                     Arrays.asList(
@@ -96,7 +96,7 @@ public class CracowLineTest
         }
 
         @Test
-        void stopsListLine100() throws Exception
+        void stopsListLine100() throws ConnectionError, ParsingException
         {
             List<Stop> expectedStops = new ArrayList<>(
                     Arrays.asList(
@@ -114,7 +114,7 @@ public class CracowLineTest
         }
 
         @Test
-        void stopDelayListFor100() throws Exception
+        void stopDelayListFor100() throws ConnectionError, ParsingException
         {
             CracowLine line = new CracowLine(100);
             Direction direction = line.getDirectionsList().get(0);
@@ -130,7 +130,7 @@ public class CracowLineTest
     public static class timetableTest
     {
         @Test
-        void timetableDayLine213() throws Exception
+        void timetableDayLine213() throws ConnectionError, ParsingException
         {
             // TODO: should I run test only if timetable didn't change? (use assume?)
 
@@ -175,7 +175,7 @@ public class CracowLineTest
         }
 
         @Test
-        void timetableNightLine605() throws Exception
+        void timetableNightLine605() throws ConnectionError, ParsingException
         {
             ArrayList<Timetable> expectedTimetable = new ArrayList<>(3);
 
@@ -212,7 +212,7 @@ public class CracowLineTest
         }
 
         @Test
-        void timetableNightLine605Direction1Stop3() throws Exception
+        void timetableNightLine605Direction1Stop3() throws ConnectionError, ParsingException
         {
             ArrayList<Timetable> expectedTimetable = new ArrayList<>(3);
 
@@ -249,7 +249,7 @@ public class CracowLineTest
         }
 
         @Test
-        void lineWith1Timetable() throws Exception
+        void lineWith1Timetable() throws ConnectionError, ParsingException
         {
             ArrayList<Timetable> expectedTimetable = new ArrayList<>(1);
 
@@ -271,7 +271,7 @@ public class CracowLineTest
         }
 
         @Test
-        void lineWith2Timetables() throws Exception
+        void lineWith2Timetables() throws ConnectionError, ParsingException
         {
             ArrayList<Timetable> expectedTimetable = new ArrayList<>(2);
 

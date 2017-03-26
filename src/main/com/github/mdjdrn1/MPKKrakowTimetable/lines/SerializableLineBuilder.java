@@ -7,7 +7,7 @@ public class SerializableLineBuilder
 {
     private SerializableLine sLine;
 
-    public SerializableLineBuilder(ILine line) throws Exception
+    public SerializableLineBuilder(ILine line) throws ParsingException, ConnectionError
     {
         int lineNumber = line.getLineNumber();
 
@@ -17,7 +17,7 @@ public class SerializableLineBuilder
         sLine.getLine().setCourse(setupCourses(line));
     }
 
-    private List<SCourse> setupCourses(ILine line) throws Exception
+    private List<SCourse> setupCourses(ILine line) throws ParsingException, ConnectionError
     {
 
         List<SCourse> courses = new ArrayList<>();
@@ -44,7 +44,7 @@ public class SerializableLineBuilder
         return courses;
     }
 
-    private List<STimetable> setupFirstStopTimetable(ILine line, Direction direction, List<Stop> stopsList) throws Exception
+    private List<STimetable> setupFirstStopTimetable(ILine line, Direction direction, List<Stop> stopsList) throws ParsingException, ConnectionError
     {
         List<Timetable> firstStopTimetable = line.getTimetables(direction, stopsList.get(0));
 
@@ -62,7 +62,7 @@ public class SerializableLineBuilder
         return newFirstStopTimetable;
     }
 
-    private List<SStop> setupStopsList(ILine line, Direction direction, List<Stop> stopsList) throws Exception
+    private List<SStop> setupStopsList(ILine line, Direction direction, List<Stop> stopsList) throws ParsingException, ConnectionError
     {
         List<Integer> delayList = line.getDelayList(direction);
 

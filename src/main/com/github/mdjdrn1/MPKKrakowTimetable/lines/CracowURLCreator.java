@@ -15,16 +15,16 @@ class CracowURLCreator implements com.github.mdjdrn1.MPKKrakowTimetable.lines.IU
         {
             linePageBase = getLineUrlBase();
         }
-        catch (Exception e)
+        catch (Exception | ConnectionError e)
         {
             System.out.println("Failed initializing static CracowLine members.");
         }
     }
 
-    private static String getLineUrlBase() throws Exception
+    private static String getLineUrlBase() throws Exception, ConnectionError
     {
         String timetableURL;
-        HtmlPage page = CracowLine.getHtmlPage(homePage);
+        HtmlPage page = XPathParser.getHtmlPage(homePage);
         HtmlTableCell cell = (HtmlTableCell) page.getFirstByXPath("//td[@class='linia_table_left']");
 
         if (cell == null)

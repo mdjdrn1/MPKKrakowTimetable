@@ -5,9 +5,9 @@ import java.util.List;
 public interface ILine
 {
     int getLineNumber();
-    List<Integer> getLineNumbersList() throws Exception;
-    List<Direction> getDirectionsList() throws Exception;
-    List<Stop> getStopsList(Direction direction) throws Exception;
-    List<Timetable> getTimetables(Direction direction, Stop stop) throws Exception;
-    List<Integer> getDelayList(Direction direction) throws Exception;
+    List<Integer> getLineNumbersList()throws ConnectionError, ParsingException;
+    List<Direction> getDirectionsList() throws ConnectionError, ParsingException;
+    List<Stop> getStopsList(Direction direction) throws ConnectionError, ParsingException;
+    List<Timetable> getTimetables(Direction direction, Stop stop) throws ConnectionError, ParsingException;
+    List<Integer> getDelayList(Direction direction) throws ConnectionError, ParsingException;
 }

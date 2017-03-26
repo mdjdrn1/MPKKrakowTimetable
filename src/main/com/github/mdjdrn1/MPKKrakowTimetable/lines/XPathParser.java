@@ -8,7 +8,7 @@ import java.io.IOException;
 
 class XPathParser
 {
-    protected static HtmlPage getHtmlPage(String url) throws Exception
+    public static HtmlPage getHtmlPage(String url) throws ConnectionError
     {
         WebClient client = new WebClient();
         client.getOptions().setCssEnabled(false);
@@ -21,13 +21,13 @@ class XPathParser
         }
         catch (IOException e)
         {
-            throw new Exception("Cannot parse page from url: \"" + url + "\".");
+            throw new ConnectionError("Failed loading url: \"" + url + "\".");
         }
 
         return page;
     }
 
-    protected static Integer getTableCellValue(HtmlTableCell item)
+    public static Integer getTableCellValue(HtmlTableCell item)
     {
         try
         {
