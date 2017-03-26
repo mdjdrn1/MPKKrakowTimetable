@@ -47,6 +47,7 @@ fabric.properties
 # User-defined
 .idea/*
 *.iml
-target/*
+target/
 example*
-/output/*
+/output/
+/log/
